@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/itemRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:elevation="0dp"
+        app:cardBackgroundColor="@color/colorPrimaryInverted"
+        app:shapeAppearanceOverlay="@style/RoundedSquare">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.example.hotmovies.presentation.shared.views.ImageViewWithAnimator
+                android:id="@+id/backdropImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:adjustViewBounds="false"
+                android:elevation="0dp"
+                android:scaleType="centerCrop"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/indicator"
+                style="@style/Widget.Material3.CircularProgressIndicator.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false"
+                android:indeterminate="true"
+                android:longClickable="false"
+                android:visibility="gone"
+                app:indicatorColor="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/backdropImage"
+                app:layout_constraintEnd_toEndOf="@id/backdropImage"
+                app:layout_constraintStart_toStartOf="@id/backdropImage"
+                app:layout_constraintTop_toTopOf="@id/backdropImage"
+                app:showDelay="100"
+                app:trackColor="@android:color/transparent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/movieTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/colorPrimaryInverted"
+                android:clickable="false"
+                android:focusable="false"
+                android:inputType="textMultiLine"
+                android:longClickable="false"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textColor="@color/colorPrimary"
+                android:textSize="17sp"
+                app:fontFamily="sans-serif-medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ratingBar"
+                app:lineSpacingMultiplier="@{0.8f}"
+                tools:text="My username" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/movieOverview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="20dp"
+                android:clickable="false"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:inputType="textMultiLine"
+                android:longClickable="false"
+                android:maxLines="3"
+                android:singleLine="false"
+                android:textAlignment="textStart"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movieTitle"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation" />
+
+            <com.example.hotmovies.presentation.shared.views.SvgRatingBar
+                android:id="@+id/ratingBar"
+                style="@style/Widget.RatingBar.Small.custom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="-10dp"
+                android:elevation="0dp"
+                android:indeterminateOnly="false"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:stepSize="0.01"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/backdropImage" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

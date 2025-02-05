@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/fragment_login_transition"
+        motion:autoTransition="none"
+        motion:constraintSetEnd="@+id/fragment_login_transition_end"
+        motion:constraintSetStart="@id/fragment_login_transition_start"
+        motion:duration="@integer/animation_duration"
+        motion:layoutDuringTransition="ignoreRequest"
+        motion:motionInterpolator="cubic(0.83,0,0.14,0.79)"
+        motion:pathMotionArc="startHorizontal">
+
+        <KeyFrameSet>
+            <KeyPosition
+                motion:framePosition="60"
+                motion:motionTarget="@id/userName"
+                motion:percentHeight="1"
+                motion:percentWidth="1" />
+            <KeyAttribute
+                motion:framePosition="60"
+                motion:motionTarget="@+id/userName">
+                <CustomAttribute
+                    motion:attributeName="corner"
+                    motion:customPixelDimension="20dp" />
+            </KeyAttribute>
+            <KeyAttribute
+                motion:framePosition="20"
+                motion:motionTarget="@+id/password">
+                <CustomAttribute
+                    motion:attributeName="corner"
+                    motion:customPixelDimension="20dp" />
+            </KeyAttribute>
+            <KeyPosition
+                motion:framePosition="30"
+                motion:keyPositionType="pathRelative"
+                motion:motionTarget="@+id/password"
+                motion:percentHeight="1"
+                motion:percentWidth="1"
+                motion:percentX="0.4"
+                motion:percentY="0" />
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/fragment_login_transition_start">
+        <Constraint android:id="@+id/userName">
+            <CustomAttribute
+                motion:attributeName="corner"
+                motion:customPixelDimension="5dp" />
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="0" />
+        </Constraint>
+        <Constraint android:id="@+id/password">
+            <CustomAttribute
+                motion:attributeName="corner"
+                motion:customPixelDimension="5dp" />
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="0" />
+        </Constraint>
+        <Constraint android:id="@+id/login">
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="0" />
+        </Constraint>
+        <Constraint android:id="@+id/indicator" />
+    </ConstraintSet>
+
+    <ConstraintSet
+        android:id="@+id/fragment_login_transition_end"
+        motion:deriveConstraintsFrom="@id/fragment_login_transition_start">
+        <Constraint android:id="@+id/userName">
+            <Layout
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                motion:layout_constraintBottom_toBottomOf="@+id/login"
+                motion:layout_constraintEnd_toEndOf="@+id/login"
+                motion:layout_constraintHorizontal_bias="0.5"
+                motion:layout_constraintStart_toStartOf="@+id/login"
+                motion:layout_constraintTop_toTopOf="@+id/login" />
+            <CustomAttribute
+                motion:attributeName="corner"
+                motion:customPixelDimension="20dp" />
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="1" />
+        </Constraint>
+        <Constraint android:id="@+id/password">
+            <Layout
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                motion:layout_constraintBottom_toBottomOf="@+id/login"
+                motion:layout_constraintEnd_toEndOf="@+id/login"
+                motion:layout_constraintHorizontal_bias="0.5"
+                motion:layout_constraintStart_toStartOf="@+id/login"
+                motion:layout_constraintTop_toTopOf="@+id/login" />
+            <CustomAttribute
+                motion:attributeName="corner"
+                motion:customPixelDimension="20dp" />
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="1" />
+        </Constraint>
+        <Constraint android:id="@+id/login">
+            <Layout
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_marginBottom="40dp"
+                motion:layout_constraintBottom_toBottomOf="parent"
+                motion:layout_constraintEnd_toEndOf="parent"
+                motion:layout_constraintHorizontal_bias="0.5"
+                motion:layout_constraintStart_toStartOf="parent"
+                motion:layout_constraintTop_toTopOf="@id/guideline"></Layout>
+            <CustomAttribute
+                motion:attributeName="floatProgress"
+                motion:customFloatValue="1" />
+        </Constraint>
+        <Constraint android:id="@+id/indicator">
+            //
+            <PropertySet android:alpha="1" />
+        </Constraint>
+    </ConstraintSet>
+
+</MotionScene>

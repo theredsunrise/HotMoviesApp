@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="fab_margin">48dp</dimen>
+    <dimen name="movies_avatar_top_margin">-20dp</dimen>
+    <dimen name="movies_info_bar_top_margin">110dp</dimen>
+    <dimen name="movies_background_image_height">220dp</dimen>
+    <integer name="span_count">2</integer>
+</resources>

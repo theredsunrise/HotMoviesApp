@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:interpolator="@android:interpolator/fast_out_slow_in"
+    android:transitionOrdering="together">
+    <changeBounds android:interpolator="@android:interpolator/fast_out_extra_slow_in">
+        <pathMotion
+            class="com.example.hotmovies.presentation.shared.transitions.TransitionMaterialArcMotion"
+            tools:ignore="Instantiatable" />
+        <targets>
+            <target android:targetId="@id/info" />
+            <target android:targetId="@id/login" />
+        </targets>
+    </changeBounds>
+    <changeTransform>
+        <targets>
+            <target android:targetId="@id/info" />
+            <target android:targetId="@id/login" />
+        </targets>
+    </changeTransform>
+    <changeClipBounds>
+        <targets>
+            <target android:targetId="@id/info" />
+            <target android:targetId="@id/login" />
+        </targets>
+    </changeClipBounds>
+    <changeImageTransform>
+        <targets>
+            <target android:targetId="@id/info" />
+            <target android:targetId="@id/login" />
+        </targets>
+    </changeImageTransform>
+    <changeScroll>
+        <targets>
+            <target android:targetId="@id/info" />
+            <target android:targetId="@id/login" />
+        </targets>
+    </changeScroll>
+    <transition
+        class="com.example.hotmovies.presentation.shared.transitions.ButtonCornerTransition"
+        tools:ignore="Instantiatable" />
+</transitionSet>

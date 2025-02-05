@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/fragment_movies_transition"
+        motion:autoTransition="none"
+        motion:constraintSetEnd="@+id/fragment_movies_transition_end"
+        motion:constraintSetStart="@id/fragment_movies_transition_start"
+        motion:duration="@integer/animation_duration"
+        motion:layoutDuringTransition="ignoreRequest">
+        <KeyFrameSet>
+            <KeyAttribute
+                motion:framePosition="80"
+                motion:motionTarget="@+id/info">
+                <CustomAttribute
+                    motion:attributeName="progress"
+                    motion:customFloatValue="0" />
+            </KeyAttribute>
+            <KeyCycle
+                android:translationY="-40dp"
+                motion:framePosition="40"
+                motion:motionTarget="@+id/avatar"
+                motion:waveOffset="0dp"
+                motion:wavePeriod="0.3" />
+            <KeyCycle
+                android:translationX="-85dp"
+                motion:framePosition="40"
+                motion:motionTarget="@+id/avatar"
+                motion:waveOffset="0dp"
+                motion:wavePeriod="0.25" />
+            <KeyCycle
+                android:rotation="50"
+                motion:framePosition="40"
+                motion:motionTarget="@+id/avatar"
+                motion:waveOffset="0dp"
+                motion:wavePeriod="0.25" />
+            <KeyAttribute
+                android:elevation="0dp"
+                motion:framePosition="18"
+                motion:motionTarget="@+id/avatar"></KeyAttribute>
+            <KeyAttribute
+                android:alpha="1"
+                motion:framePosition="73"
+                motion:motionTarget="@+id/avatar" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="74"
+                motion:motionTarget="@+id/avatar" />
+        </KeyFrameSet>
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:moveWhenScrollAtTop="false"
+            motion:touchAnchorId="@id/recyclerView" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/fragment_movies_transition_start">
+        <Constraint android:id="@+id/prepend_progress">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/append_progress">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/indicator">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/background"></Constraint>
+        <Constraint android:id="@+id/info">
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="1" />
+        </Constraint>
+        <Constraint android:id="@+id/avatar">
+            <PropertySet android:alpha="1" />
+            <Transform android:elevation="1dp" />
+        </Constraint>
+        <Constraint android:id="@+id/name" />
+        <Constraint android:id="@+id/userName">
+            <PropertySet android:alpha="1" />
+        </Constraint>
+        <Constraint android:id="@+id/description">
+            <PropertySet android:alpha="1" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet
+        android:id="@+id/fragment_movies_transition_end"
+        motion:deriveConstraintsFrom="@id/fragment_movies_transition_start">
+        <Constraint android:id="@+id/prepend_progress">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/append_progress">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/indicator">
+            <PropertySet
+                motion:applyMotionScene="false"
+                motion:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@+id/background">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                motion:layout_constraintEnd_toEndOf="parent"
+                motion:layout_constraintStart_toStartOf="parent"
+                motion:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@+id/info">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="1px"
+                motion:layout_constraintEnd_toEndOf="parent"
+                motion:layout_constraintStart_toStartOf="parent"
+                motion:layout_constraintTop_toTopOf="parent" />
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="0" />
+        </Constraint>
+        <Constraint android:id="@+id/avatar">
+            <PropertySet android:alpha="0" />
+            <Transform android:elevation="0dp" />
+        </Constraint>
+        <Constraint android:id="@+id/name">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                motion:layout_constrainedWidth="true"
+                motion:layout_constraintEnd_toEndOf="@id/info"
+                motion:layout_constraintStart_toStartOf="@id/info"
+                motion:layout_constraintTop_toTopOf="@+id/info" />
+        </Constraint>
+        <Constraint android:id="@+id/userName">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                motion:layout_constrainedWidth="true"
+                motion:layout_constraintEnd_toEndOf="@id/info"
+                motion:layout_constraintStart_toStartOf="@id/info"
+                motion:layout_constraintTop_toBottomOf="@+id/name" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+        <Constraint android:id="@+id/description">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                motion:layout_constrainedWidth="true"
+                motion:layout_constraintEnd_toEndOf="@id/info"
+                motion:layout_constraintStart_toStartOf="@id/info"
+                motion:layout_constraintTop_toBottomOf="@+id/userName" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+    </ConstraintSet>
+
+</MotionScene>

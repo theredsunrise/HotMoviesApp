@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="layoutViewModel"
+            type="com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel" />
+    </data>
+
+    <com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout
+        android:id="@+id/motionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_movies_xml_constraintlayout_scene"
+        tools:context=".presentation.movies.list.MoviesFragment">
+
+        <FrameLayout
+            android:id="@+id/background"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/movies_background_image_height"
+            android:layout_marginStart="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:padding="0dp"
+                android:scaleType="fitStart"
+                android:src="@drawable/vector_background"
+                app:contentPadding="0dp" />
+        </FrameLayout>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/indicator"
+            style="@style/Widget.Material3.CircularProgressIndicator.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:indeterminate="true"
+            android:visibility="@{layoutViewModel.state.loadAction.content.progress ? View.VISIBLE : View.GONE}"
+            app:indicatorColor="@color/colorPrimaryInverted"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toEndOf="@+id/avatar"
+            app:layout_constraintStart_toStartOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:showDelay="100"
+            app:trackColor="@android:color/transparent" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/avatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="@dimen/movies_avatar_top_margin"
+            android:background="@color/colorPrimary"
+            android:outlineAmbientShadowColor="@android:color/transparent"
+            android:outlineSpotShadowColor="@android:color/transparent"
+            android:scaleType="centerCrop"
+            android:src="@{layoutViewModel.state.loadAction.content.progress ? null : layoutViewModel.state.userDetails.avatar}"
+            app:layout_constraintStart_toStartOf="@id/info"
+            app:layout_constraintTop_toTopOf="@+id/info"
+            app:shapeAppearanceOverlay="@style/RoundedSquare.Avatar" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/info"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="@dimen/movies_info_bar_top_margin"
+            android:clipChildren="true"
+            android:clipToPadding="false"
+            android:elevation="0dp"
+            android:transitionName="toCardView"
+            app:cardBackgroundColor="@color/colorPrimaryInverted"
+            app:cardPreventCornerOverlap="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ContentHeaderCornerCut"
+            app:strokeWidth="0px"></com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:fontFamily="@font/lobster"
+            android:includeFontPadding="false"
+            android:minHeight="0dp"
+            android:text="@{layoutViewModel.state.userDetails.name}"
+            android:textColor="@color/colorPrimary"
+            android:textSize="35sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@id/info"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/info"
+            tools:text="Myname" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/userName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-3dp"
+            android:includeFontPadding="false"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="@{layoutViewModel.state.userDetails.userName}"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            app:fontFamily="sans-serif-medium"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@id/info"
+            app:layout_constraintStart_toStartOf="@id/name"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="username" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="10dp"
+            android:includeFontPadding="false"
+            android:maxLines="3"
+            android:text="@{layoutViewModel.state.userDetails.overview}"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/colorPrimary"
+            android:textSize="17sp"
+            android:textStyle="normal"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@id/info"
+            app:layout_constraintStart_toStartOf="@id/avatar"
+            app:layout_constraintTop_toBottomOf="@+id/avatar"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:orientation="vertical"
+            android:overScrollMode="never"
+            app:layoutManager=".presentation.shared.layouts.CustomStaggeredGridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/info"
+            app:spanCount="@integer/span_count"
+            tools:listitem="@layout/movie_list_item" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/prepend_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="@{layoutViewModel.state.loadAction.content.progress ? View.VISIBLE : View.INVISIBLE}"
+            app:indicatorColor="@color/colorPrimaryInverted"
+            app:layout_constraintEnd_toEndOf="@id/recyclerView"
+            app:layout_constraintStart_toStartOf="@id/recyclerView"
+            app:layout_constraintTop_toTopOf="@id/recyclerView"
+            app:trackColor="@android:color/transparent" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/append_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:indicatorColor="@color/colorPrimaryInverted"
+            app:layout_constraintBottom_toBottomOf="@id/recyclerView"
+            app:layout_constraintEnd_toEndOf="@id/recyclerView"
+            app:layout_constraintStart_toStartOf="@id/recyclerView"
+            app:trackColor="@android:color/transparent" />
+
+    </com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout>
+</layout>

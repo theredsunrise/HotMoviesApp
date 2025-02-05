@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.HotMovies" parent="Base.Theme.HotMovies" />
+</resources>

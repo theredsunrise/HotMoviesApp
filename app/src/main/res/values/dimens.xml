@@ -1,0 +1,12 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="movies_avatar_top_margin">-20dp</dimen>
+    <dimen name="fragment_horizontal_margin">16dp</dimen>
+    <dimen name="fragment_vertical_margin">16dp</dimen>
+    <dimen name="movie_image_height_type_long">200dp</dimen>
+    <dimen name="movie_image_height_type_short">150dp</dimen>
+    <dimen name="movies_background_image_height">180dp</dimen>
+    <dimen name="movies_info_bar_top_margin">100dp</dimen>
+    <integer name="span_count">1</integer>
+    <integer name="animation_duration">500</integer>
+</resources>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.login.LoginFragment">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="layoutViewModel"
+            type="com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/login_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout
+            android:id="@+id/motionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutDescription="@xml/fragment_login_xml_constraintlayout_scene"
+            tools:showPaths="true">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/usernameFireStart"
+                android:layout_width="50dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="-15dp"
+                android:layout_marginBottom="-25dp"
+                android:elevation="0dp"
+                app:layout_constraintBottom_toTopOf="@id/userName"
+                app:layout_constraintStart_toStartOf="@id/userName"
+                app:lottie_autoPlay="true"
+                app:lottie_colorFilter="@color/colorPrimaryInverted"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/fire" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/usernameFireEnd"
+                android:layout_width="50dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="-35dp"
+                android:layout_marginBottom="-25dp"
+                android:elevation="0dp"
+                app:layout_constraintBottom_toTopOf="@id/userName"
+                app:layout_constraintStart_toEndOf="@id/userName"
+                app:lottie_autoPlay="true"
+                app:lottie_colorFilter="@color/colorPrimaryInverted"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/fire" />
+
+            <com.example.hotmovies.presentation.shared.layouts.CustomTextInputLayout
+                android:id="@+id/userName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:enabled="@{layoutViewModel.state.isScreenEnabled}"
+                android:hint="@string/userName"
+                android:minWidth="200dp"
+                app:errorEnabled="true"
+                app:errorText="@{layoutViewModel.state.userNameText.exception.localizedMessage ?? ``}"
+                app:layout_constraintBottom_toTopOf="@+id/password"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_max="260dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/userNameEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="0dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:nextFocusDown="@id/password"
+                    android:text="@={layoutViewModel.userNameText}"
+                    tools:text="Test" />
+
+            </com.example.hotmovies.presentation.shared.layouts.CustomTextInputLayout>
+
+            <com.example.hotmovies.presentation.shared.layouts.CustomTextInputLayout
+                android:id="@+id/password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:enabled="@{layoutViewModel.state.isScreenEnabled}"
+                android:hint="@string/password"
+                android:minWidth="200dp"
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true"
+                app:errorText="@{layoutViewModel.state.passwordText.exception.localizedMessage ?? ``}"
+                app:layout_constraintBottom_toTopOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_max="260dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:imeOptions="actionGo"
+                    android:inputType="textPassword"
+                    android:text="@={layoutViewModel.passwordText}"
+                    tools:text="Test" />
+
+            </com.example.hotmovies.presentation.shared.layouts.CustomTextInputLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/movieTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:fontFamily="@font/lobster"
+                android:includeFontPadding="false"
+                android:text="@string/app_name"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toTopOf="@+id/description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:text="@string/app_description"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toTopOf="@+id/creditsAndAttributions"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_percent="0.8" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/creditsAndAttributions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:text="@string/credits_and_attributions"
+                android:textSize="12sp"
+                android:textStyle="normal"
+                android:textColor="@color/colorPrimaryDarkerMiddle"
+                app:layout_constraintBottom_toTopOf="@+id/login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_percent="0.8" />
+
+            <com.example.hotmovies.presentation.shared.views.CustomButton
+                android:id="@+id/login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:enabled="@{layoutViewModel.state.loginButton.isEnabled &amp;&amp; layoutViewModel.state.isScreenEnabled}"
+                android:imeOptions="actionGo"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="100dp"
+                android:minHeight="60dp"
+                android:padding="0dp"
+                android:text="@string/login"
+                android:transitionName="toCardView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/guideline"
+                app:layout_constraintVertical_bias="0.75"
+                app:layout_constraintWidth_max="180dp" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/indicator"
+                style="@style/Widget.Material3.CircularProgressIndicator.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0"
+                android:indeterminate="true"
+                app:indicatorColor="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/login"
+                app:layout_constraintEnd_toEndOf="@+id/login"
+                app:layout_constraintStart_toStartOf="@+id/login"
+                app:layout_constraintTop_toTopOf="@+id/login"
+                app:showDelay="100"
+                app:trackColor="@android:color/transparent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+        </com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>
