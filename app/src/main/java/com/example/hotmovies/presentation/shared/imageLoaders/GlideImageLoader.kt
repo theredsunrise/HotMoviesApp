@@ -64,7 +64,7 @@ class GlideImageLoader private constructor() : ImageLoaderInterface {
         requestManager
             .asDrawable()
             .load(model)
-            .error(R.drawable.vector_cross)
+            .error(context.errorDrawable)
             .dontTransform()
             .sizeMultiplier(0.5f)
             .dontAnimate()

@@ -1,11 +1,17 @@
 package com.example.hotmovies.presentation.movies.detail
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.statusBars
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,6 +28,7 @@ import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsVi
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
+import com.example.hotmovies.presentation.shared.helpers.DrawableFactory
 import com.example.hotmovies.presentation.shared.helpers.ToolbarConfigurator
 import com.example.hotmovies.presentation.shared.imageLoaders.GlideImageLoader
 import com.example.hotmovies.presentation.shared.imageLoaders.ImageThumbnailLoaderContextInterface
@@ -63,8 +70,8 @@ class MovieDetailsFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             movieId = movie.id
         }
-        sharedElementEnterTransition =
-            TransitionFactory.materialContainerTransform(userInteractionComponent = userInteractionComponent)
+
+        setupInsets()
         postponeDetailSharedTransitions()
         return binding.root
     }
@@ -105,15 +112,30 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, insets ->
+            val detectedInsets = insets.getInsets(statusBars())
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = detectedInsets.top
+            }
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
     private fun loadPosterImage(url: String) {
         val context = object : ImageThumbnailLoaderContextInterface {
             override val loadingTimestamp = 0
             override val animationDuration = Constants.AnimationDurations.DEFAULT
+            override val errorDrawable: Drawable get() = DrawableFactory.getInstance(requireContext()).crossInverted
             override fun onLoadState(state: Async<Any>) {
                 binding.indicator.isVisible = state.isProgress
             }
         }
-        glideImageLoader.asAnimatedThumbnailInto(context, MovieImageModel(url), binding.posterImage)
+        glideImageLoader.asAnimatedThumbnailInto(
+            context,
+            MovieImageModel(url),
+            binding.posterImage
+        )
     }
 
     private fun loadImage(url: String, target: ImageView) {
@@ -121,9 +143,8 @@ class MovieDetailsFragment : Fragment() {
     }
 
     private fun postponeDetailSharedTransitions() {
-        sharedElementEnterTransition = TransitionFactory.materialContainerTransform(
-            userInteractionComponent, Constants.AnimationDurations.DEFAULT
-        )
+        sharedElementEnterTransition =
+            TransitionFactory.materialContainerTransform(userInteractionComponent = userInteractionComponent)
         postponeEnterTransition()
     }
 
