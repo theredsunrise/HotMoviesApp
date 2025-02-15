@@ -15,6 +15,7 @@ import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Action
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
 import com.example.hotmovies.presentation.shared.helpers.FragmentExitDialogFactory
 import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.safeNavigation
 import com.example.hotmovies.shared.userInteractionComponent
@@ -46,7 +47,7 @@ class ProcessUserLogout(
     override suspend fun collect(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
             moviesViewModel.state.collect { state ->
-                processLogoutAction(state)
+                processLogoutAction(state.logoutAction)
             }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
@@ -65,12 +66,11 @@ class ProcessUserLogout(
         }
     }
 
-    private fun processLogoutAction(state: MoviesViewModel.UIState) {
-        val logoutAction = state.logoutAction.getContentIfNotHandled() ?: return
+    private fun processLogoutAction(logoutAction: Event<Async<Boolean>>) {
         checkMainThread()
+        val logoutAction = logoutAction.getContentIfNotHandled() ?: return
 
         fragment.userInteractionComponent.isEnabled = !logoutAction.isProgress
-
         when {
             logoutAction.isSuccessTrue -> {
                 fragment.exitTransition = null

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 class UserDetailsAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope
-) : BaseAsyncViewModelAction<Unit, User>(1, coroutineScope = coroutineScope) {
+) : BaseAsyncViewModelAction<Unit, User>(coroutineScope) {
 
     private val movieDataRepository = diContainer.tmdbMovieDataRepository
 

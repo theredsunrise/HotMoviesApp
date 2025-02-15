@@ -11,7 +11,7 @@ class LoginAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope
 ) :
-    BaseAsyncViewModelAction<LoginUserUseCase.Credentials, Unit>(coroutineScope = coroutineScope) {
+    BaseAsyncViewModelAction<LoginUserUseCase.Credentials, Unit>(coroutineScope) {
 
     private val settingsRepository = diContainer.settingsRepository
     private val loginRepository = diContainer.loginRepository

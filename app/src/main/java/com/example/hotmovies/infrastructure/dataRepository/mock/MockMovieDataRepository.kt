@@ -46,14 +46,14 @@ class MockMovieDataRepository(
             1,
             "backdrop",
             "poster",
-            "Test title wekljwrljwlrejwlerkjwlrjwlrjwlrj",
+            "Title 0987654321",
             "Original title",
-            "This is test. aslakjdlakdjalkdaldjaldkjaldjalkdjaldjalkdjalkdjqwlkejqlejqlwejqlwejqlwekjqlwkejqlwejlqwej",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
             listOf(Movie.Genre.TV_MOVIE),
             565877,
             7.66,
             876786,
-            "14 Maj 2014"
+            "14 May 2014"
         )
         emit(movieDetails)
     }
@@ -66,13 +66,13 @@ class MockMovieDataRepository(
                 id,
                 1,
                 "backdrop",
-                "Test title wekljwrljwlrejwlerkjwlrjwlrjwlrj",
+                "Test title 1234567890",
                 "Original title",
-                "This is test. aslakjdlakdjalkdaldjaldkjaldjalkdjaldjalkdjalkdjqwlkejqlejqlwejqlwejqlwekjqlwkejqlwejlqwej",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
                 "poster",
                 listOf(Movie.Genre.TV_MOVIE),
                 4.0,
-                "Oktober",
+                "October",
                 3.0,
                 345
             )

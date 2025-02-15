@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-class DialogFragmentFactory(val owner: String) : DefaultLifecycleObserver {
+class DialogFragmentFactory(private val owner: String) : DefaultLifecycleObserver {
 
     private val confirmKey = owner + "ConfirmKey"
     private val cancelKey = owner + "CancelKey"
