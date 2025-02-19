@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.shareIn
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-abstract class BaseViewModelAction<I, O>(replay: Int = 0, coroutineScope: CoroutineScope) {
+abstract class BaseViewModelAction<I, O>(coroutineScope: CoroutineScope, replay: Int = 0) {
     private var trigger =
         MutableSharedFlow<I>(replay, 1, BufferOverflow.DROP_OLDEST)
 

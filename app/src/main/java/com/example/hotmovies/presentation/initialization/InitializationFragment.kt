@@ -22,6 +22,7 @@ import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Action
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
 import com.example.hotmovies.shared.Async
 import com.example.hotmovies.shared.Event
+import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.safeNavigation
 import kotlinx.coroutines.Dispatchers
@@ -71,8 +72,9 @@ class InitializationFragment : Fragment() {
         }
     }
 
-    private fun processSessionValidityAction(state: Event<Async<Boolean>>) {
-        val sessionValidityAction = state.getContentIfNotHandled() ?: return
+    private fun processSessionValidityAction(sessionValidityAction: Event<Async<Boolean>>) {
+        checkMainThread()
+        val sessionValidityAction = sessionValidityAction.getContentIfNotHandled() ?: return
 
         binding.indicator.isVisible = sessionValidityAction.isProgress
         when (sessionValidityAction) {

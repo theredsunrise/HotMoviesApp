@@ -12,7 +12,7 @@ class MovieDetailsAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope
 ) :
-    BaseAsyncViewModelAction<Int, MovieDetails>(1, coroutineScope) {
+    BaseAsyncViewModelAction<Int, MovieDetails>(coroutineScope) {
 
     private val movieDataRepository = diContainer.tmdbMovieDataRepository
 

@@ -11,7 +11,7 @@ class LogoutAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope
 ) :
-    BaseAsyncViewModelAction<Unit, Unit>(coroutineScope = coroutineScope) {
+    BaseAsyncViewModelAction<Unit, Unit>(coroutineScope) {
 
     private val settingsRepository = diContainer.settingsRepository
     private val loginRepository = diContainer.loginRepository

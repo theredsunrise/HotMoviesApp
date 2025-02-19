@@ -50,10 +50,6 @@ class MovieDetailsViewModel(diContainer: DIContainer) : CustomViewModel() {
         }
     }
 
-    sealed interface Actions {
-        data class LoadMovieDetails(val movieId: Int) : Actions
-    }
-
     private val movieDetailsAction = MovieDetailsAction(diContainer, viewModelScope)
 
     private var _state = MutableStateFlow(UIState.defaultState())
@@ -76,6 +72,10 @@ class MovieDetailsViewModel(diContainer: DIContainer) : CustomViewModel() {
                 is Async.Failure -> _state.update { it.copy(loadAction = result.exception.asyncEventFailure()) }
             }
         }.launchIn(viewModelScope)
+    }
+
+    sealed interface Actions {
+        data class LoadMovieDetails(val movieId: Int) : Actions
     }
 
     fun doAction(action: Actions) {

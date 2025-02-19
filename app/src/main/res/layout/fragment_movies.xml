@@ -84,7 +84,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ContentHeaderCornerCut"
-            app:strokeWidth="0px"></com.google.android.material.card.MaterialCardView>
+            app:strokeWidth="0dp"></com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"

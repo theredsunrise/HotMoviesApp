@@ -72,13 +72,6 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
         }
     }
 
-    sealed interface Actions {
-        data class ShowingMovieDetail(val isActive: Boolean) : Actions
-        data object LoadUserDetails : Actions
-        data object LoadMovies : Actions
-        data object Logout : Actions
-    }
-
     private val resources = diContainer.appContext.resources
     private val logoutAction = LogoutAction(diContainer, viewModelScope)
     private val moviesAction = MoviesAction(diContainer, viewModelScope, viewModelScope)
@@ -133,6 +126,13 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
         }.launchIn(viewModelScope)
     }
 
+    sealed interface Actions {
+        data class ShowingMovieDetail(val isActive: Boolean) : Actions
+        data object LoadUserDetails : Actions
+        data object LoadMovies : Actions
+        data object Logout : Actions
+    }
+
     fun doAction(action: Actions) {
         when (action) {
             is Actions.ShowingMovieDetail -> {
@@ -149,9 +149,5 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
             is LoadUserDetails -> userDetailsAction.run(Unit)
             is Logout -> logoutAction.run(Unit)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }

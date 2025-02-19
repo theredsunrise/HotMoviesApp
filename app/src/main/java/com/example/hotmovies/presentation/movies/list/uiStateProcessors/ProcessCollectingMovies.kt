@@ -12,6 +12,7 @@ import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
 import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.failure
 import com.example.hotmovies.shared.isLoading
@@ -35,7 +36,7 @@ class ProcessCollectingMovies(
     override suspend fun collect(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
             moviesViewModel.state.collect { state ->
-                processCollectingMoviesAction(state)
+                processCollectingMoviesAction(state.loadAction)
             }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
@@ -61,9 +62,9 @@ class ProcessCollectingMovies(
         }
     }
 
-    private fun processCollectingMoviesAction(state: MoviesViewModel.UIState) {
-        val loadAction = state.loadAction.getContentIfNotHandled() ?: return
+    private fun processCollectingMoviesAction(loadAction: Event<Async<Boolean>>) {
         checkMainThread()
+        val loadAction = loadAction.getContentIfNotHandled() ?: return
 
         when {
             loadAction.isSuccessTrue -> moviesViewModel.doAction(LoadMovies)

@@ -17,7 +17,7 @@ import com.bumptech.glide.module.AppGlideModule
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.example.hotmovies.appplication.login.interfaces.MovieImageRepositoryInterface
-import com.example.hotmovies.presentation.shared.CustomApplication
+import com.example.hotmovies.presentation.CustomApplication
 import com.example.hotmovies.shared.checkNotMainThread
 import java.io.InputStream
 

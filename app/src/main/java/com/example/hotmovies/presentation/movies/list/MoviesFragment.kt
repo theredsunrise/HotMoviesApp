@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.displayCutout
+import androidx.core.view.WindowInsetsCompat.Type.statusBars
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -38,6 +43,8 @@ import com.example.hotmovies.shared.safeNavigation
 import com.example.hotmovies.shared.toPairs
 import com.example.hotmovies.shared.transitionToStartAsync
 import com.example.hotmovies.shared.userInteractionComponent
+import com.google.android.material.transition.Hold
+import com.google.android.material.transition.MaterialElevationScale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -81,6 +88,8 @@ class MoviesFragment : Fragment() {
             Fade(Fade.MODE_OUT),
             duration = Constants.AnimationDurations.DEFAULT
         )
+
+        setupInsets()
         postponeLoginSharedTransitions()
         postponeMovieDetailSharedTransitions()
         return binding.root
@@ -104,6 +113,19 @@ class MoviesFragment : Fragment() {
                 processUserLogout.collect(this)
                 processCollectingMovies.collect(this)
             }
+        }
+    }
+
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val detectedInsets = insets.getInsets(statusBars() or displayCutout())
+            view.updatePadding(
+                view.paddingLeft,
+                detectedInsets.top,
+                view.paddingRight,
+                view.paddingBottom
+            )
+            WindowInsetsCompat.CONSUMED
         }
     }
 

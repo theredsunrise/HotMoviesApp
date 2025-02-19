@@ -13,7 +13,7 @@ class SessionValidityAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope
 ) :
-    BaseAsyncEventViewModelAction<Unit, Boolean>(1, coroutineScope) {
+    BaseAsyncEventViewModelAction<Unit, Boolean>(coroutineScope, 1) {
 
     private val loginRepository = diContainer.loginRepository
     private val settingsRepository = diContainer.settingsRepository

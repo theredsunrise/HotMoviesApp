@@ -13,7 +13,7 @@ class MoviesAction(
     diContainer: DIContainer,
     coroutineScope: CoroutineScope,
     private val cacheCoroutineScope: CoroutineScope
-) : BaseViewModelAction<Unit, PagingData<Movie>>(1, coroutineScope = coroutineScope) {
+) : BaseViewModelAction<Unit, PagingData<Movie>>(coroutineScope, 1) {
 
     private val movieDataRepository = diContainer.tmdbMovieDataRepository
 
