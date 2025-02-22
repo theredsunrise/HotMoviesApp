@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SessionValidityAction(
+    coroutineScope: CoroutineScope,
     diContainer: DIContainer,
-    coroutineScope: CoroutineScope
+    onStart: (suspend () -> Unit)
 ) :
-    BaseAsyncEventViewModelAction<Unit, Boolean>(1, coroutineScope) {
+    BaseAsyncEventViewModelAction<Unit, Boolean>(coroutineScope, 1, onStart = onStart) {
 
     private val loginRepository = diContainer.loginRepository
     private val settingsRepository = diContainer.settingsRepository

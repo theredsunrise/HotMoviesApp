@@ -1,5 +1,6 @@
 package com.example.hotmovies.presentation.movies.list.adapters
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.example.hotmovies.R
 import com.example.hotmovies.appplication.movies.MovieImageModel
 import com.example.hotmovies.databinding.MovieListItemBinding
 import com.example.hotmovies.domain.Movie
+import com.example.hotmovies.presentation.shared.helpers.DrawableFactory
 import com.example.hotmovies.presentation.shared.imageLoaders.ImageLoaderInterface
 import com.example.hotmovies.presentation.shared.imageLoaders.ImageThumbnailLoaderContextInterface
 import com.example.hotmovies.shared.Async
@@ -55,6 +57,8 @@ class MoviesAdapter(
         ImageThumbnailLoaderContextInterface {
 
         override val animationDuration: Long = Constants.AnimationDurations.DEFAULT
+        override val errorDrawable: Drawable get() = DrawableFactory.getInstance(itemView.context).cross
+
         override fun onLoadState(state: Async<Any>) {
             binding.indicator.isVisible = state.isProgress
             binding.root.isClickable = state.isSuccess

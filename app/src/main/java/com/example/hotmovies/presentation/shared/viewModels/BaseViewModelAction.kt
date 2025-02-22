@@ -11,19 +11,26 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-abstract class BaseViewModelAction<I, O>(replay: Int = 0, coroutineScope: CoroutineScope) {
+abstract class BaseViewModelAction<I, O>(
+    coroutineScope: CoroutineScope,
+    replay: Int = 0,
+    onStart: (suspend () -> Unit)? = null
+) {
     private var trigger =
         MutableSharedFlow<I>(replay, 1, BufferOverflow.DROP_OLDEST)
 
     protected abstract fun action(value: I): Flow<O>
 
     val state: Flow<O> =
-        trigger.debounce(100).flatMapLatest { input ->
+        trigger.onStart {
+            onStart?.invoke()
+        }.debounce(100).flatMapLatest { input ->
             action(input)
-        }.shareIn(coroutineScope, SharingStarted.Lazily, replay = replay)
+        }.shareIn(coroutineScope, SharingStarted.Lazily, replay)
 
     fun run(input: I) {
         trigger.tryEmit(input)

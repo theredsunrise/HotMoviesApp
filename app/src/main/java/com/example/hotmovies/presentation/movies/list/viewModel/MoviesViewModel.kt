@@ -58,7 +58,7 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
     data class UIState(
         val userDetails: UserDetailsUIState,
         var movieDetailAction: Event<Boolean>,
-        val loadAction: Event<Async<Boolean>>,
+        val userDetailsAction: Event<Async<Boolean>>,
         val logoutAction: Event<Async<Boolean>>
     ) {
         companion object {
@@ -72,17 +72,10 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
         }
     }
 
-    sealed interface Actions {
-        data class ShowingMovieDetail(val isActive: Boolean) : Actions
-        data object LoadUserDetails : Actions
-        data object LoadMovies : Actions
-        data object Logout : Actions
-    }
-
     private val resources = diContainer.appContext.resources
-    private val logoutAction = LogoutAction(diContainer, viewModelScope)
-    private val moviesAction = MoviesAction(diContainer, viewModelScope, viewModelScope)
-    private val userDetailsAction = UserDetailsAction(diContainer, viewModelScope)
+    private val logoutAction = LogoutAction(viewModelScope, diContainer)
+    private val moviesAction = MoviesAction(viewModelScope, diContainer, viewModelScope)
+    private val userDetailsAction = UserDetailsAction(viewModelScope, diContainer)
 
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()
@@ -99,14 +92,14 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
                                 resources,
                                 result.value
                             ),
-                            loadAction = true.asyncEvent()
+                            userDetailsAction = true.asyncEvent()
                         )
                     }
 
                 }
 
-                is progress -> _state.update { it.copy(loadAction = progressEvent) }
-                is Async.Failure -> _state.update { it.copy(loadAction = result.exception.asyncEventFailure()) }
+                is progress -> _state.update { it.copy(userDetailsAction = progressEvent) }
+                is Async.Failure -> _state.update { it.copy(userDetailsAction = result.exception.asyncEventFailure()) }
             }
         }.launchIn(viewModelScope)
 
@@ -123,7 +116,7 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
 
                 is progress -> _state.update {
                     it.copy(
-                        loadAction = progressEvent,
+                        userDetailsAction = progressEvent,
                         logoutAction = progressEvent
                     )
                 }
@@ -131,6 +124,13 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
                 is Async.Failure -> _state.update { it.copy(logoutAction = result.exception.asyncEventFailure()) }
             }
         }.launchIn(viewModelScope)
+    }
+
+    sealed interface Actions {
+        data class ShowingMovieDetail(val isActive: Boolean) : Actions
+        data object LoadUserDetails : Actions
+        data object LoadMovies : Actions
+        data object Logout : Actions
     }
 
     fun doAction(action: Actions) {
@@ -149,9 +149,5 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
             is LoadUserDetails -> userDetailsAction.run(Unit)
             is Logout -> logoutAction.run(Unit)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }

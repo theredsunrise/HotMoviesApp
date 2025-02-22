@@ -4,23 +4,28 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState.Loading
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
 import com.example.hotmovies.databinding.FragmentMoviesBinding
+import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.list.adapters.MoviesAdapter
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadUserDetails
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
 import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.failure
 import com.example.hotmovies.shared.isLoading
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class ProcessCollectingMovies(
+class ProcessMovies(
     private val fragment: Fragment,
     private val binding: FragmentMoviesBinding,
     private val moviesViewModel: MoviesViewModel
@@ -34,8 +39,19 @@ class ProcessCollectingMovies(
 
     override suspend fun collect(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesViewModel.state.collect { state ->
-                processCollectingMoviesAction(state)
+            moviesViewModel.adapterMoviesFlow
+                .combine(
+                    moviesViewModel.state,
+                    { movies, state -> Pair(movies, state.logoutAction) })
+                .collectLatest { groupedState ->
+                    checkMainThread()
+                    processLoadMoviesAction(groupedState)
+                }
+        }
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            moviesAdapter.loadStateFlow.collect() {
+                checkMainThread()
+                processMovieLoadStatesAction(it)
             }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
@@ -44,38 +60,30 @@ class ProcessCollectingMovies(
                 if (action is Accept) else {
                     return@exit
                 }
-                moviesViewModel.doAction(LoadUserDetails)
-            }
-        }
-        coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesViewModel.adapterMoviesFlow.collectLatest { movies ->
-                checkMainThread()
-                moviesAdapter.submitData(movies)
-            }
-        }
-        coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesAdapter.loadStateFlow.collect {
-                checkMainThread()
-                processMovieLoadStatesAction(it)
+                moviesViewModel.doAction(LoadMovies)
             }
         }
     }
 
-    private fun processCollectingMoviesAction(state: MoviesViewModel.UIState) {
-        val loadAction = state.loadAction.getContentIfNotHandled() ?: return
-        checkMainThread()
-
-        when {
-            loadAction.isSuccessTrue -> moviesViewModel.doAction(LoadMovies)
-            loadAction.isSuccessFalse -> moviesViewModel.doAction(LoadUserDetails)
-            loadAction is Async.Failure -> moviesDialogFactory.showErrorDialog(
-                fragment.findNavController(),
-                loadAction.exception
-            )
+    private fun processLoadMoviesAction(groupedState: Pair<PagingData<Movie>, Event<Async<Boolean>>>) {
+        val pagingData = with(groupedState) {
+            val (movies, logoutAction) = groupedState
+            if (logoutAction.content.isProgress) {
+                val loadStates = LoadStates(
+                    Loading,
+                    Loading,
+                    Loading
+                )
+                PagingData.from(emptyList<Movie>(), sourceLoadStates = loadStates)
+            } else {
+                movies
+            }
         }
+        moviesAdapter.submitData(fragment.viewLifecycleOwner.lifecycle, pagingData)
     }
 
     private fun processMovieLoadStatesAction(loadStates: CombinedLoadStates) {
+        checkMainThread()
         fragment.startPostponedEnterTransition()
 
         loadStates.source.apply {

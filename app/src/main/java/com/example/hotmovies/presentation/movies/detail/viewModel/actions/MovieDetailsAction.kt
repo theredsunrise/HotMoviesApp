@@ -9,10 +9,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 class MovieDetailsAction(
-    diContainer: DIContainer,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    diContainer: DIContainer
 ) :
-    BaseAsyncViewModelAction<Int, MovieDetails>(1, coroutineScope) {
+    BaseAsyncViewModelAction<Int, MovieDetails>(coroutineScope) {
 
     private val movieDataRepository = diContainer.tmdbMovieDataRepository
 

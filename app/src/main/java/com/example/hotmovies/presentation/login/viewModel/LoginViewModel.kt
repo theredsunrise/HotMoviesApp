@@ -50,7 +50,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()
 
-    private val loginAction = LoginAction(diContainer, viewModelScope)
+    private val loginAction = LoginAction(viewModelScope, diContainer)
 
     init {
         combine(userNameText, passwordText) { userName, password ->

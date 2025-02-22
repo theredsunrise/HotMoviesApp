@@ -8,10 +8,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 class LogoutAction(
-    diContainer: DIContainer,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    diContainer: DIContainer
 ) :
-    BaseAsyncViewModelAction<Unit, Unit>(coroutineScope = coroutineScope) {
+    BaseAsyncViewModelAction<Unit, Unit>(coroutineScope) {
 
     private val settingsRepository = diContainer.settingsRepository
     private val loginRepository = diContainer.loginRepository
