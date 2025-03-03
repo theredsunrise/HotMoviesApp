@@ -5,10 +5,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
-sealed interface Async<out T> {
-    data object Progress : Async<Nothing>
-    data class Success<T>(val value: T) : Async<T>
-    data class Failure(val exception: Exception) : Async<Nothing>
+sealed interface ResultState<out T> {
+    data object Progress : ResultState<Nothing>
+    data class Success<T>(val value: T) : ResultState<T>
+    data class Failure(val exception: Exception) : ResultState<Nothing>
 
     val isProgress: Boolean
         get() {
@@ -57,19 +57,19 @@ sealed interface Async<out T> {
     }
 }
 
-fun <T> T.async(): Async.Success<T> = Async.Success(this)
-fun <T> T.asyncEvent(): Event<Async.Success<T>> = Event(Async.Success(this))
-fun Exception.asyncFailure() = Async.Failure(this)
-fun Exception.asyncEventFailure() = Event(Async.Failure(this))
-typealias progress = Async.Progress
+fun <T> T.state(): ResultState.Success<T> = ResultState.Success(this)
+fun <T> T.stateEvent(): Event<ResultState.Success<T>> = Event(ResultState.Success(this))
+fun Exception.stateFailure() = ResultState.Failure(this)
+fun Exception.stateEventFailure() = Event(ResultState.Failure(this))
+typealias progress = ResultState.Progress
 
-val progressEvent: Event<Async.Progress> get() = Event(progress)
+val progressEvent: Event<ResultState.Progress> get() = Event(progress)
 
-fun <T> Flow<T>.asResult(): Flow<Async<T>> {
-    return this.map<T, Async<T>> { it.async() }
+fun <T> Flow<T>.asStateResult(): Flow<ResultState<T>> {
+    return this.map<T, ResultState<T>> { it.state() }
         .onStart { emit(progress) }
         .catch { e ->
             if (e !is Exception) throw e
-            emit(e.asyncFailure())
+            emit(e.stateFailure())
         }
 }

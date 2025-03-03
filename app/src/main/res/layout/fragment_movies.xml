@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:elevation="2dp"
             android:indeterminate="true"
-            android:visibility="@{layoutViewModel.state.loadAction.content.progress ? View.VISIBLE : View.GONE}"
+            android:visibility="@{layoutViewModel.state.userDetailsAction.content.progress ? View.VISIBLE : View.GONE}"
             app:indicatorColor="@color/colorPrimaryInverted"
             app:layout_constraintBottom_toBottomOf="@+id/avatar"
             app:layout_constraintEnd_toEndOf="@+id/avatar"
@@ -64,7 +64,7 @@
             android:outlineAmbientShadowColor="@android:color/transparent"
             android:outlineSpotShadowColor="@android:color/transparent"
             android:scaleType="centerCrop"
-            android:src="@{layoutViewModel.state.loadAction.content.progress ? null : layoutViewModel.state.userDetails.avatar}"
+            android:src="@{layoutViewModel.state.userDetailsAction.content.progress ? null : layoutViewModel.state.userDetails.avatar}"
             app:layout_constraintStart_toStartOf="@id/info"
             app:layout_constraintTop_toTopOf="@+id/info"
             app:shapeAppearanceOverlay="@style/RoundedSquare.Avatar" />
@@ -84,7 +84,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ContentHeaderCornerCut"
-            app:strokeWidth="0px"></com.google.android.material.card.MaterialCardView>
+            app:strokeWidth="0dp"></com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -173,7 +173,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:visibility="@{layoutViewModel.state.loadAction.content.progress ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{layoutViewModel.state.userDetailsAction.content.progress ? View.VISIBLE : View.INVISIBLE}"
             app:indicatorColor="@color/colorPrimaryInverted"
             app:layout_constraintEnd_toEndOf="@id/recyclerView"
             app:layout_constraintStart_toStartOf="@id/recyclerView"

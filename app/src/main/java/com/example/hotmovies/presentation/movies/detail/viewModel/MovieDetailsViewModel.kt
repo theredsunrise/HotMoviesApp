@@ -6,13 +6,13 @@ import com.example.hotmovies.domain.MovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Actions.LoadMovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.actions.MovieDetailsAction
 import com.example.hotmovies.presentation.shared.viewModels.CustomViewModel
-import com.example.hotmovies.shared.Async
 import com.example.hotmovies.shared.Event
-import com.example.hotmovies.shared.asyncEvent
-import com.example.hotmovies.shared.asyncEventFailure
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.progress
 import com.example.hotmovies.shared.progressEvent
+import com.example.hotmovies.shared.stateEvent
+import com.example.hotmovies.shared.stateEventFailure
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -43,18 +43,14 @@ class MovieDetailsViewModel(diContainer: DIContainer) : CustomViewModel() {
 
     data class UIState(
         val movieDetails: MovieDetailsUIState,
-        val loadAction: Event<Async<Boolean>>
+        val loadAction: Event<ResultState<Boolean>>
     ) {
         companion object {
-            fun defaultState() = UIState(MovieDetailsUIState.defaultState(), false.asyncEvent())
+            fun defaultState() = UIState(MovieDetailsUIState.defaultState(), false.stateEvent())
         }
     }
 
-    sealed interface Actions {
-        data class LoadMovieDetails(val movieId: Int) : Actions
-    }
-
-    private val movieDetailsAction = MovieDetailsAction(diContainer, viewModelScope)
+    private val movieDetailsAction = MovieDetailsAction(viewModelScope, diContainer)
 
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()
@@ -63,19 +59,23 @@ class MovieDetailsViewModel(diContainer: DIContainer) : CustomViewModel() {
         movieDetailsAction.state.onEach { result ->
             checkMainThread()
             when (result) {
-                is Async.Success -> {
+                is ResultState.Success -> {
                     _state.update {
                         it.copy(
                             MovieDetailsUIState.fromDomain(result.value),
-                            loadAction = true.asyncEvent()
+                            loadAction = true.stateEvent()
                         )
                     }
                 }
 
                 is progress -> _state.update { it.copy(loadAction = progressEvent) }
-                is Async.Failure -> _state.update { it.copy(loadAction = result.exception.asyncEventFailure()) }
+                is ResultState.Failure -> _state.update { it.copy(loadAction = result.exception.stateEventFailure()) }
             }
         }.launchIn(viewModelScope)
+    }
+
+    sealed interface Actions {
+        data class LoadMovieDetails(val movieId: Int) : Actions
     }
 
     fun doAction(action: Actions) {

@@ -2,7 +2,7 @@ package com.example.hotmovies.presentation.login
 
 import com.example.hotmovies.presentation.UserInteractionConfigurableComponent
 import com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout
-import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.transitionToEndAsync
 import com.example.hotmovies.shared.transitionToStartAsync
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,11 +26,11 @@ class LoginAnimator(
     }
 
     private val _state =
-        MutableStateFlow<Async<TransitionState>>(Async.Success(TransitionState.Start))
+        MutableStateFlow<ResultState<TransitionState>>(ResultState.Success(TransitionState.Start))
     val state = _state.asStateFlow()
 
     suspend fun transitionToStartAsync(immediately: Boolean) {
-        _state.value = Async.Progress
+        _state.value = ResultState.Progress
         userInteractionComponent.isEnabled = false
         motionLayout.isEnabledLayoutTransition = false
 
@@ -38,11 +38,11 @@ class LoginAnimator(
 
         motionLayout.isEnabledLayoutTransition = true
         userInteractionComponent.isEnabled = true
-        _state.value = Async.Success(TransitionState.Start)
+        _state.value = ResultState.Success(TransitionState.Start)
     }
 
     suspend fun transitionToEndAsync(immediately: Boolean) {
-        _state.value = Async.Progress
+        _state.value = ResultState.Progress
         userInteractionComponent.isEnabled = false
         motionLayout.isEnabledLayoutTransition = false
 
@@ -50,6 +50,6 @@ class LoginAnimator(
 
         motionLayout.isEnabledLayoutTransition = true
         userInteractionComponent.isEnabled = true
-        _state.value = Async.Success(TransitionState.End)
+        _state.value = ResultState.Success(TransitionState.End)
     }
 }

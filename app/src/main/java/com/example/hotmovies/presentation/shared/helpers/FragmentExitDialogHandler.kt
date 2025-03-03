@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class FragmentExitDialogFactory(
+class FragmentExitDialogHandler(
     private val owner: String,
     @StringRes private val titleId: Int,
     private val message: String,
@@ -31,7 +31,7 @@ class FragmentExitDialogFactory(
         MutableSharedFlow(0, 1, BufferOverflow.DROP_OLDEST)
     val state: Flow<Unit> = _state.asSharedFlow()
 
-    private val dialogFactory = DialogFragmentFactory(owner)
+    private val dialogHandler = DialogFragmentHandler(owner)
     private var fragment: Fragment? = null
 
     override fun onStart(owner: LifecycleOwner) {
@@ -40,13 +40,13 @@ class FragmentExitDialogFactory(
             .onBackPressedDispatcher
             .addCallback(
                 owner,
-                this@FragmentExitDialogFactory
+                this@FragmentExitDialogHandler
             )
 
         val viewLifecycleOwner = owner.viewLifecycleOwner
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                dialogFactory.state.collect { action ->
+                dialogHandler.state.collect { action ->
                     checkMainThread()
                     when (action) {
                         is Accept -> _state.tryEmit(Unit)
@@ -56,14 +56,14 @@ class FragmentExitDialogFactory(
             }
         }
 
-        owner.lifecycle.addObserver(dialogFactory)
+        owner.lifecycle.addObserver(dialogHandler)
         fragment = owner
         isEnabled = true
     }
 
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        (owner as Fragment).lifecycle.removeObserver(dialogFactory)
+        (owner as Fragment).lifecycle.removeObserver(dialogHandler)
         fragment = null
         isEnabled = false
         this.remove()
@@ -72,7 +72,7 @@ class FragmentExitDialogFactory(
     override fun handleOnBackPressed() {
         val fragment = fragment ?: return
         if (!fragment.viewLifecycleOwner.lifecycle.currentState.isAtLeast(STARTED)) return
-        dialogFactory.showDialog(
+        dialogHandler.showDialog(
             fragment.findNavController(),
             titleId,
             message,
