@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.displayCutout
+import androidx.core.view.WindowInsetsCompat.Type.statusBars
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -20,7 +25,8 @@ import com.example.hotmovies.databinding.FragmentMoviesBinding
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.list.adapters.GridSpacingItemDecoration
 import com.example.hotmovies.presentation.movies.list.adapters.MoviesAdapter
-import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessCollectingMovies
+import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessMovies
+import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessUserDetails
 import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessUserLogout
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.ShowingMovieDetail
@@ -52,8 +58,11 @@ class MoviesFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentMoviesBinding
+
+    private lateinit var processUserDetails: ProcessUserDetails
     private lateinit var processUserLogout: ProcessUserLogout
-    private lateinit var processCollectingMovies: ProcessCollectingMovies
+    private lateinit var processCollectingMovies: ProcessMovies
+
     private var isViewModelCreated = false
     private var isFirstInstanceOfFragment = false
 
@@ -71,8 +80,9 @@ class MoviesFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        processUserLogout = ProcessUserLogout(this, binding, moviesViewModel)
-        processCollectingMovies = ProcessCollectingMovies(this, binding, moviesViewModel)
+        processUserDetails = ProcessUserDetails(this, moviesViewModel)
+        processUserLogout = ProcessUserLogout(this, moviesViewModel)
+        processCollectingMovies = ProcessMovies(this, binding, moviesViewModel)
 
         enterTransition = TransitionFactory.materialSharedAxis(userInteractionComponent, true)
         returnTransition = TransitionFactory.materialSharedAxis(userInteractionComponent, false)
@@ -81,6 +91,8 @@ class MoviesFragment : Fragment() {
             Fade(Fade.MODE_OUT),
             duration = Constants.AnimationDurations.DEFAULT
         )
+
+        setupInsets()
         postponeLoginSharedTransitions()
         postponeMovieDetailSharedTransitions()
         return binding.root
@@ -100,10 +112,24 @@ class MoviesFragment : Fragment() {
 
             moviesViewModel.doAction(ShowingMovieDetail(false))
 
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                processUserLogout.collect(this)
-                processCollectingMovies.collect(this)
+            viewLifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+                processUserLogout.collect(this@repeatOnLifecycle)
+                processUserDetails.collect(this@repeatOnLifecycle)
+                processCollectingMovies.collect(this@repeatOnLifecycle)
             }
+        }
+    }
+
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val detectedInsets = insets.getInsets(statusBars() or displayCutout())
+            view.updatePadding(
+                view.paddingLeft,
+                detectedInsets.top,
+                view.paddingRight,
+                view.paddingBottom
+            )
+            WindowInsetsCompat.CONSUMED
         }
     }
 

@@ -6,6 +6,8 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat.Type.navigationBars
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import com.example.hotmovies.R
@@ -40,7 +42,22 @@ class MainActivity : AppCompatActivity(), UserInteractionConfigurableComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setupInsets()
         setContentView(binding.root)
+    }
+
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root.findViewById(R.id.nav_host_fragment_content_main)) { view, insets ->
+            val detectedInsets =
+                insets.getInsets(navigationBars())
+            view.setPadding(
+                detectedInsets.left,
+                detectedInsets.top,
+                detectedInsets.right,
+                detectedInsets.bottom
+            )
+            insets
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -52,5 +69,4 @@ class MainActivity : AppCompatActivity(), UserInteractionConfigurableComponent {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp() || super.onNavigateUp()
     }
-
 }

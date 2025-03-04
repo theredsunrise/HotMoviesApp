@@ -4,6 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.displayCutout
+import androidx.core.view.WindowInsetsCompat.Type.statusBars
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,7 +23,9 @@ import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Actions.Animation
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Actions.Login
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
-import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.Event
+import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.doOnLayoutAsync
 import com.example.hotmovies.shared.hideSoftKeyboardAsync
@@ -43,6 +50,8 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         binding.layoutViewModel = loginViewModel
         binding.lifecycleOwner = viewLifecycleOwner
+
+        setupInsets()
         return binding.root
     }
 
@@ -73,19 +82,32 @@ class LoginFragment : Fragment() {
 
                 launch(Dispatchers.Main.immediate) {
                     loginViewModel.state.collect { state ->
-                        processLoginAction(state, animator)
+                        processLoginAction(state.loginAction, animator)
                     }
                 }
             }
         }
     }
 
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val detectedInsets = insets.getInsets(statusBars() or displayCutout())
+            view.updatePadding(
+                view.paddingLeft,
+                detectedInsets.top,
+                view.paddingRight,
+                view.paddingBottom
+            )
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
     private suspend fun processLoginAction(
-        state: LoginViewModel.UIState,
+        loginAction: Event<ResultState<Boolean>>,
         animator: LoginAnimator
     ) {
-        val loginAction =
-            state.loginAction.getContentIfNotHandled() ?: return
+        checkMainThread()
+        val loginAction = loginAction.getContentIfNotHandled() ?: return
         when {
             loginAction.isSuccessTrue -> navigate()
             loginAction.isFailure -> {
@@ -94,8 +116,10 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun processAnimationAction(state: Async<LoginAnimator.TransitionState>) {
+    private fun processAnimationAction(state: ResultState<LoginAnimator.TransitionState>) {
+        checkMainThread()
         loginViewModel.doAction(Animation(state.isProgress))
+
         if (state.success?.isEnd == true) {
             loginViewModel.doAction(Login)
         }

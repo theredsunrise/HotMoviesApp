@@ -8,16 +8,14 @@ import com.example.hotmovies.presentation.initialization.viewModel.actions.Sessi
 
 class InitializationViewModel(diContainer: DIContainer) :
     ViewModel() {
-    private val sessionValidityAction = SessionValidityAction(diContainer, viewModelScope)
+    private val sessionValidityAction = SessionValidityAction(viewModelScope, diContainer) {
+        doAction(CheckSessionValidity)
+    }
 
-    val state get() = sessionValidityAction.state
+    val state = sessionValidityAction.state
 
     sealed interface Actions {
         data object CheckSessionValidity : Actions
-    }
-
-    init {
-        doAction(CheckSessionValidity)
     }
 
     fun doAction(action: Actions) {

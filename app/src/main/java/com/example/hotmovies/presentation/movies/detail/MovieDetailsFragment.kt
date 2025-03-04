@@ -1,11 +1,17 @@
 package com.example.hotmovies.presentation.movies.detail
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type.statusBars
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,13 +27,15 @@ import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsVi
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.UIState
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
-import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
+import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
+import com.example.hotmovies.presentation.shared.helpers.DrawableFactory
 import com.example.hotmovies.presentation.shared.helpers.ToolbarConfigurator
 import com.example.hotmovies.presentation.shared.imageLoaders.GlideImageLoader
 import com.example.hotmovies.presentation.shared.imageLoaders.ImageThumbnailLoaderContextInterface
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
-import com.example.hotmovies.shared.Async
 import com.example.hotmovies.shared.Constants
+import com.example.hotmovies.shared.Event
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.doOnLayoutAsync
@@ -42,7 +50,7 @@ class MovieDetailsFragment : Fragment() {
     private val movieDetailsViewModel: MovieDetailsViewModel by viewModels {
         MovieDetailsViewModelFactory(diContainer())
     }
-    private val movieDetailsDialogFactory = DialogFragmentFactory("movieDetails")
+    private val movieDetailsDialogFactory = DialogFragmentHandler("movieDetails")
 
     private lateinit var movie: Movie
     private lateinit var binding: FragmentMovieDetailsBinding
@@ -63,8 +71,8 @@ class MovieDetailsFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             movieId = movie.id
         }
-        sharedElementEnterTransition =
-            TransitionFactory.materialContainerTransform(userInteractionComponent = userInteractionComponent)
+
+        setupInsets()
         postponeDetailSharedTransitions()
         return binding.root
     }
@@ -88,7 +96,7 @@ class MovieDetailsFragment : Fragment() {
                 }
                 launch(Dispatchers.Main.immediate) {
                     movieDetailsViewModel.state.collect { state ->
-                        processLoadingMovieDetailsAction(movie.id, state)
+                        processLoadingMovieDetailsAction(movie.id, state.loadAction)
                         processDataOfMovieDetailsAction(state)
                     }
                 }
@@ -105,15 +113,30 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, insets ->
+            val detectedInsets = insets.getInsets(statusBars())
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = detectedInsets.top
+            }
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
     private fun loadPosterImage(url: String) {
         val context = object : ImageThumbnailLoaderContextInterface {
             override val loadingTimestamp = 0
             override val animationDuration = Constants.AnimationDurations.DEFAULT
-            override fun onLoadState(state: Async<Any>) {
+            override val errorDrawable: Drawable get() = DrawableFactory.getInstance(requireContext()).crossInverted
+            override fun onLoadState(state: ResultState<Any>) {
                 binding.indicator.isVisible = state.isProgress
             }
         }
-        glideImageLoader.asAnimatedThumbnailInto(context, MovieImageModel(url), binding.posterImage)
+        glideImageLoader.asAnimatedThumbnailInto(
+            context,
+            MovieImageModel(url),
+            binding.posterImage
+        )
     }
 
     private fun loadImage(url: String, target: ImageView) {
@@ -121,9 +144,8 @@ class MovieDetailsFragment : Fragment() {
     }
 
     private fun postponeDetailSharedTransitions() {
-        sharedElementEnterTransition = TransitionFactory.materialContainerTransform(
-            userInteractionComponent, Constants.AnimationDurations.DEFAULT
-        )
+        sharedElementEnterTransition =
+            TransitionFactory.materialContainerTransform(userInteractionComponent = userInteractionComponent)
         postponeEnterTransition()
     }
 
@@ -136,12 +158,15 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
-    private fun processLoadingMovieDetailsAction(movieId: Int, state: UIState) {
+    private fun processLoadingMovieDetailsAction(
+        movieId: Int,
+        loadAction: Event<ResultState<Boolean>>
+    ) {
         checkMainThread()
-        val loadAction = state.loadAction.getContentIfNotHandled() ?: return
+        val loadAction = loadAction.getContentIfNotHandled() ?: return
         when {
             loadAction.isSuccessFalse -> movieDetailsViewModel.doAction(LoadMovieDetails(movieId))
-            loadAction is Async.Failure -> movieDetailsDialogFactory.showErrorDialog(
+            loadAction is ResultState.Failure -> movieDetailsDialogFactory.showErrorDialog(
                 findNavController(),
                 loadAction.exception
             )
