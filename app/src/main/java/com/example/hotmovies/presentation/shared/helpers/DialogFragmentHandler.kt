@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-class DialogFragmentFactory(val owner: String) : DefaultLifecycleObserver {
+class DialogFragmentHandler(private val owner: String) : DefaultLifecycleObserver {
 
     private val confirmKey = owner + "ConfirmKey"
     private val cancelKey = owner + "CancelKey"
@@ -64,7 +64,7 @@ class DialogFragmentFactory(val owner: String) : DefaultLifecycleObserver {
     fun showErrorDialog(navController: NavController, error: Throwable) {
         showDialog(
             navController,
-            R.string.dialog_info_title,
+            R.string.dialog_error_title,
             error.localizedMessage.orEmpty(),
             R.string.dialog_action_retry
         )

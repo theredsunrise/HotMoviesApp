@@ -1,7 +1,8 @@
-package com.example.hotmovies.infrastructure.dataRepository
+package com.example.hotmovies.presentation.shared.pagers
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.shared.checkNotMainThread
 import kotlinx.coroutines.CoroutineDispatcher

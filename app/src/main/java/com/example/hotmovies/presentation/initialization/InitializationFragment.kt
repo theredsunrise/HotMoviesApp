@@ -19,9 +19,10 @@ import com.example.hotmovies.presentation.initialization.viewModel.Initializatio
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Cancel
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.None
-import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
-import com.example.hotmovies.shared.Async
+import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.shared.Event
+import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.safeNavigation
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ import kotlinx.coroutines.launch
 
 class InitializationFragment : Fragment() {
     private lateinit var binding: FragmentInitializationBinding
-    private val errorDialogFactory = DialogFragmentFactory("sessionValidity")
+    private val errorDialogFactory = DialogFragmentHandler("sessionValidity")
     private val initializationViewModel: InitializationViewModel by viewModels {
         InitializationViewModelFactory(
             diContainer()
@@ -71,20 +72,21 @@ class InitializationFragment : Fragment() {
         }
     }
 
-    private fun processSessionValidityAction(state: Event<Async<Boolean>>) {
-        val sessionValidityAction = state.getContentIfNotHandled() ?: return
+    private fun processSessionValidityAction(sessionValidityAction: Event<ResultState<Boolean>>) {
+        checkMainThread()
+        val sessionValidityAction = sessionValidityAction.getContentIfNotHandled() ?: return
 
         binding.indicator.isVisible = sessionValidityAction.isProgress
         when (sessionValidityAction) {
-            is Async.Success -> navigate(sessionValidityAction.value)
-            is Async.Failure -> {
+            is ResultState.Success -> navigate(sessionValidityAction.value)
+            is ResultState.Failure -> {
                 errorDialogFactory.showErrorDialog(
                     findNavController(),
                     sessionValidityAction.exception
                 )
             }
 
-            Async.Progress -> {}
+            ResultState.Progress -> {}
         }
     }
 

@@ -19,3 +19,47 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Retrofit & Gson Rules ---
+
+# Keep Retrofit interfaces to avoid stripping API definitions
+-keep interface retrofit2.**
+
+# Keep Retrofit annotations (e.g., @GET, @POST, etc.)
+-keepattributes *Annotation*
+
+# Keep Retrofit response model classes (if using Gson converter)
+-keep class * implements com.google.gson.TypeAdapter { *; }
+-keep class * implements com.google.gson.JsonDeserializer { *; }
+-keep class * implements com.google.gson.JsonSerializer { *; }
+
+# Keep classes annotated with @SerializedName (needed for Gson)
+-keep class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Keep Gson model classes (if using GsonConverterFactory)
+-keep class com.google.gson.** { *; }
+-keep class * extends com.google.gson.TypeAdapter { *; }
+
+# Prevent Gson from stripping @Expose or @SerializedName annotations
+-keepattributes *Annotation*
+
+# Keep classes that use @Serializable (for kotlinx.serialization)
+-keep @kotlinx.serialization.Serializable class * { *; }
+
+# Keep Kotlin serialization-related metadata
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class * {
+    @kotlinx.serialization.Serializable *;
+}
+
+# Keep the generated companion object methods (important for decoding)
+-keepclassmembers class * {
+    static ** Companion;
+}
+
+# Prevent obfuscation of the Serialization constructor
+-keepclassmembers class * {
+    <init>(kotlinx.serialization.descriptors.SerialDescriptor, ...);
+}

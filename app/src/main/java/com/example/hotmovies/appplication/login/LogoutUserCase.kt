@@ -2,8 +2,8 @@ package com.example.hotmovies.appplication.login
 
 import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
 import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
-import com.example.hotmovies.shared.Async
-import com.example.hotmovies.shared.asResult
+import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.asStateResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,8 +18,8 @@ class LogoutUserCase(
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    operator fun invoke(): Flow<Async<Unit>> = loginRepository.logout()
+    operator fun invoke(): Flow<ResultState<Unit>> = loginRepository.logout()
         .flatMapLatest {
             settingsRepository.clear(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY)
-        }.asResult().flowOn(dispatcher)
+        }.asStateResult().flowOn(dispatcher)
 }

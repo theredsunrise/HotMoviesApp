@@ -3,10 +3,10 @@ package com.example.hotmovies.infrastructure.dataRepository.tmdb
 import android.graphics.Bitmap
 import com.example.hotmovies.BuildConfig
 import com.example.hotmovies.appplication.login.interfaces.MovieImageRepositoryInterface
+import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
 import com.example.hotmovies.domain.MovieDetails
 import com.example.hotmovies.domain.MoviesInfo
 import com.example.hotmovies.domain.User
-import com.example.hotmovies.infrastructure.dataRepository.MovieDataRepositoryInterface
 import com.example.hotmovies.shared.checkNotMainThread
 import com.example.hotmovies.shared.toUse
 import com.google.gson.Gson

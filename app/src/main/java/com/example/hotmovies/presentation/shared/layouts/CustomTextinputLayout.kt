@@ -5,8 +5,8 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
+import com.example.hotmovies.R
 import com.google.android.material.R.attr
-import com.google.android.material.color.MaterialColors
 import com.google.android.material.textfield.TextInputLayout
 
 class CustomTextInputLayout @JvmOverloads constructor(
@@ -24,7 +24,7 @@ class CustomTextInputLayout @JvmOverloads constructor(
         val errorIconDrawable: Drawable?
     )
 
-    private val colorPrimary = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorPrimary)
+    private val colorPrimary = context.getColor(R.color.colorPrimaryInverted)
     private val transparentColorStateList =
         ColorStateList.valueOf(ContextCompat.getColor(this.context, android.R.color.transparent))
     private val finalSnapshot = Snapshot(

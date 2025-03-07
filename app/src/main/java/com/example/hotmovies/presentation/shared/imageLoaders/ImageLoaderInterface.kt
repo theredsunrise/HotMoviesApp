@@ -1,13 +1,15 @@
 package com.example.hotmovies.presentation.shared.imageLoaders
 
+import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.example.hotmovies.presentation.shared.views.ImageViewWithAnimator
-import com.example.hotmovies.shared.Async
+import com.example.hotmovies.shared.ResultState
 
 interface ImageThumbnailLoaderContextInterface {
     val loadingTimestamp: Int
     val animationDuration: Long
-    fun onLoadState(state: Async<Any>)
+    val errorDrawable: Drawable
+    fun onLoadState(state: ResultState<Any>)
 }
 
 interface ImageLoaderInterface {

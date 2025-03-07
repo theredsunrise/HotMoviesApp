@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
+import com.example.hotmovies.R
 import com.google.android.material.R.attr
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.color.MaterialColors
 
 class CustomButton
 @JvmOverloads constructor(
@@ -19,7 +19,7 @@ class CustomButton
         val textColors: ColorStateList?
     )
 
-    private val colorPrimary = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorPrimary)
+    private val colorPrimary = context.getColor(R.color.colorPrimaryInverted)
     private val colorStateList = ColorStateList.valueOf(colorPrimary)
     private val transparentColorStateList =
         ColorStateList.valueOf(ContextCompat.getColor(this.context, android.R.color.transparent))

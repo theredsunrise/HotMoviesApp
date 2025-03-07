@@ -29,17 +29,17 @@ object TmdbMovieImageApiFactory {
             .addInterceptor(interceptor)
             .cache(null)
             .build()
-        com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiFactory.instance =
+        instance =
             Retrofit.Builder().baseUrl(
-                com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiFactory.BASE_URL
+                BASE_URL
             )
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client).build()
     }
 
-    fun create(): com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiInterface {
-        return com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiFactory.instance.create(
-            com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiInterface::class.java
+    fun create(): TmdbMovieImageApiInterface {
+        return instance.create(
+            TmdbMovieImageApiInterface::class.java
         )
     }
 }

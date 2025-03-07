@@ -28,8 +28,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/usernameFireStart"
-                android:layout_width="50dp"
-                android:layout_height="100dp"
+                android:layout_width="40dp"
+                android:layout_height="90dp"
                 android:layout_marginStart="-15dp"
                 android:layout_marginBottom="-25dp"
                 android:elevation="0dp"
@@ -42,9 +42,9 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/usernameFireEnd"
-                android:layout_width="50dp"
-                android:layout_height="100dp"
-                android:layout_marginStart="-35dp"
+                android:layout_width="40dp"
+                android:layout_height="90dp"
+                android:layout_marginStart="-25dp"
                 android:layout_marginBottom="-25dp"
                 android:elevation="0dp"
                 app:layout_constraintBottom_toTopOf="@id/userName"
@@ -112,7 +112,7 @@
             </com.example.hotmovies.presentation.shared.layouts.CustomTextInputLayout>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/movieTitle"
+                android:id="@+id/appTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
@@ -132,12 +132,12 @@
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
                 android:text="@string/app_description"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="normal"
                 app:layout_constraintBottom_toTopOf="@+id/creditsAndAttributions"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintWidth_percent="0.8" />
+                app:layout_constraintWidth_percent="0.9" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/creditsAndAttributions"
@@ -147,19 +147,18 @@
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
                 android:text="@string/credits_and_attributions"
-                android:textSize="12sp"
-                android:textStyle="normal"
                 android:textColor="@color/colorPrimaryDarkerMiddle"
+                android:textSize="13sp"
+                android:textStyle="normal"
                 app:layout_constraintBottom_toTopOf="@+id/login"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintWidth_percent="0.8" />
+                app:layout_constraintWidth_percent="0.9" />
 
             <com.example.hotmovies.presentation.shared.views.CustomButton
                 android:id="@+id/login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
                 android:enabled="@{layoutViewModel.state.loginButton.isEnabled &amp;&amp; layoutViewModel.state.isScreenEnabled}"
                 android:imeOptions="actionGo"
                 android:insetLeft="0dp"
@@ -176,7 +175,7 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/guideline"
-                app:layout_constraintVertical_bias="0.75"
+                app:layout_constraintVertical_bias="0.6"
                 app:layout_constraintWidth_max="180dp" />
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -199,7 +198,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5" />
+                app:layout_constraintGuide_percent="0.45" />
 
         </com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout>
 

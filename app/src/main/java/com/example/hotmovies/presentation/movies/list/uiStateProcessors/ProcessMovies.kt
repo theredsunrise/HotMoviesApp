@@ -4,78 +4,87 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState.Loading
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
 import com.example.hotmovies.databinding.FragmentMoviesBinding
+import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.list.adapters.MoviesAdapter
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadUserDetails
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
-import com.example.hotmovies.presentation.shared.helpers.DialogFragmentFactory
-import com.example.hotmovies.shared.Async
+import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
+import com.example.hotmovies.shared.Event
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.failure
 import com.example.hotmovies.shared.isLoading
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class ProcessCollectingMovies(
+class ProcessMovies(
     private val fragment: Fragment,
     private val binding: FragmentMoviesBinding,
     private val moviesViewModel: MoviesViewModel
 ) : UiStateProcessorInterface {
 
-    private val moviesDialogFactory = DialogFragmentFactory("movies")
+    private val moviesDialogHandler = DialogFragmentHandler("movies")
 
     init {
-        fragment.lifecycle.addObserver(moviesDialogFactory)
+        fragment.lifecycle.addObserver(moviesDialogHandler)
     }
 
     override suspend fun collect(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesViewModel.state.collect { state ->
-                processCollectingMoviesAction(state)
-            }
-        }
-        coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesDialogFactory.state.collect exit@{ action ->
-                checkMainThread()
-                if (action is Accept) else {
-                    return@exit
+            moviesViewModel.moviesPagingData
+                .combine(
+                    moviesViewModel.state,
+                    { movies, state -> Pair(movies, state.logoutAction) })
+                .collectLatest { groupedState ->
+                    checkMainThread()
+                    processLoadMoviesAction(groupedState)
                 }
-                moviesViewModel.doAction(LoadUserDetails)
-            }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesViewModel.adapterMoviesFlow.collectLatest { movies ->
-                checkMainThread()
-                moviesAdapter.submitData(movies)
-            }
-        }
-        coroutineScope.launch(Dispatchers.Main.immediate) {
-            moviesAdapter.loadStateFlow.collect {
+            moviesAdapter.loadStateFlow.collect() {
                 checkMainThread()
                 processMovieLoadStatesAction(it)
             }
         }
-    }
-
-    private fun processCollectingMoviesAction(state: MoviesViewModel.UIState) {
-        val loadAction = state.loadAction.getContentIfNotHandled() ?: return
-        checkMainThread()
-
-        when {
-            loadAction.isSuccessTrue -> moviesViewModel.doAction(LoadMovies)
-            loadAction.isSuccessFalse -> moviesViewModel.doAction(LoadUserDetails)
-            loadAction is Async.Failure -> moviesDialogFactory.showErrorDialog(
-                fragment.findNavController(),
-                loadAction.exception
-            )
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            moviesDialogHandler.state.collect exit@{ action ->
+                checkMainThread()
+                if (action is Accept) else {
+                    return@exit
+                }
+                moviesViewModel.doAction(LoadMovies)
+            }
         }
     }
 
+    private fun processLoadMoviesAction(groupedState: Pair<PagingData<Movie>, Event<ResultState<Boolean>>>) {
+        val pagingData = with(groupedState) {
+            val (movies, logoutAction) = groupedState
+            val showLoading = with(logoutAction.content) { isSuccessTrue || isProgress || isFailure }
+            if (showLoading) {
+                val loadStates = LoadStates(
+                    Loading,
+                    Loading,
+                    Loading
+                )
+                PagingData.from(emptyList<Movie>(), sourceLoadStates = loadStates)
+            } else {
+                movies
+            }
+        }
+        moviesAdapter.submitData(fragment.viewLifecycleOwner.lifecycle, pagingData)
+    }
+
     private fun processMovieLoadStatesAction(loadStates: CombinedLoadStates) {
+        checkMainThread()
         fragment.startPostponedEnterTransition()
 
         loadStates.source.apply {
@@ -86,7 +95,7 @@ class ProcessCollectingMovies(
                 append.isLoading || isRefreshLoading
 
             arrayOf(append, prepend, refresh).firstNotNullOfOrNull { it.failure }?.let { error ->
-                moviesDialogFactory.showErrorDialog(fragment.findNavController(), error)
+                moviesDialogHandler.showErrorDialog(fragment.findNavController(), error)
             }
         }
     }

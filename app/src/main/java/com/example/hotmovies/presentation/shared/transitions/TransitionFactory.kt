@@ -6,6 +6,7 @@ import com.example.hotmovies.R
 import com.example.hotmovies.presentation.UserInteractionConfigurableComponent
 import com.example.hotmovies.shared.Constants
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialElevationScale
 import com.google.android.material.transition.MaterialSharedAxis
 
 object TransitionFactory {
@@ -40,6 +41,20 @@ object TransitionFactory {
             scrimColor = Color.TRANSPARENT
             setAllContainerColors(Color.TRANSPARENT)
         }.apply { this.duration = duration }
+        return UserInteractionTransitionWrapper(
+            userInteractionComponent,
+            containerTransition
+        )
+    }
+
+    fun materialElevationScale(
+        userInteractionComponent: UserInteractionConfigurableComponent,
+        growing: Boolean,
+        duration: Long = Constants.AnimationDurations.DEFAULT,
+        drawingViewId: Int = R.id.nav_host_fragment_content_main,
+    ): UserInteractionTransitionWrapper {
+
+        val containerTransition = MaterialElevationScale(growing)
         return UserInteractionTransitionWrapper(
             userInteractionComponent,
             containerTransition

@@ -4,21 +4,24 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.example.hotmovies.R
 import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
-import com.example.hotmovies.appplication.login.interfaces.MovieDataPagingRepositoryInterface
 import com.example.hotmovies.appplication.login.interfaces.MovieImageRepositoryInterface
 import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
+import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
+import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.infrastructure.LoginRepository
 import com.example.hotmovies.infrastructure.SettingsRepository
-import com.example.hotmovies.infrastructure.dataRepository.MovieDataPagingRepository
 import com.example.hotmovies.infrastructure.dataRepository.mock.MockMovieDataRepository
 import com.example.hotmovies.infrastructure.dataRepository.mock.MockMovieImageRepository
 import com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieDataApiInterface
 import com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieDataApiServiceFactory
 import com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieDataRepository
+import com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiFactory
 import com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageRepository
+import com.example.hotmovies.presentation.shared.pagers.MoviePagingSource
 import kotlinx.coroutines.Dispatchers
 
 class DIContainer(val appContext: Context) {
@@ -30,7 +33,7 @@ class DIContainer(val appContext: Context) {
     }
 
     private val tmdbMovieImageApiService: com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiInterface by lazy {
-        com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiFactory.create()
+        TmdbMovieImageApiFactory.create()
     }
 
     val loginRepository: LoginRepositoryInterface by lazy {
@@ -41,6 +44,19 @@ class DIContainer(val appContext: Context) {
         SettingsRepository(appContext.dataStore)
     }
 
+    val tmdbPager: Pager<Int, Movie> by lazy {
+        val pagingConfig = PagingConfig(20, enablePlaceholders = false)
+        Pager(
+            config = pagingConfig,
+            pagingSourceFactory = {
+                MoviePagingSource(
+                    tmdbMovieDataRepository,
+                    Dispatchers.IO
+                )
+            }
+        )
+    }
+
     val tmdbMovieImageRepository: MovieImageRepositoryInterface by lazy {
         TmdbMovieImageRepository(tmdbMovieImageApiService)
     }
@@ -49,23 +65,11 @@ class DIContainer(val appContext: Context) {
         MockMovieImageRepository(appContext, R.drawable.vector_background)
     }
 
-    val tmdbMovieDataRepository: MovieDataPagingRepositoryInterface by lazy {
-        val tmdbMovieDataRepository =
-            TmdbMovieDataRepository(tmdbMovieDataApiService, tmdbMovieImageRepository)
-        MovieDataPagingRepository(
-            PagingConfig(20, enablePlaceholders = false),
-            tmdbMovieDataRepository,
-            Dispatchers.IO
-        )
+    val tmdbMovieDataRepository: MovieDataRepositoryInterface by lazy {
+        TmdbMovieDataRepository(tmdbMovieDataApiService, tmdbMovieImageRepository)
     }
 
-    val _tmdbMovieDataRepository: MovieDataPagingRepositoryInterface by lazy {
-        val mockMovieDataRepository =
-            MockMovieDataRepository(appContext, R.drawable.vector_background)
-        MovieDataPagingRepository(
-            PagingConfig(20, enablePlaceholders = false),
-            mockMovieDataRepository,
-            Dispatchers.IO
-        )
+    val _tmdbMovieDataRepository: MovieDataRepositoryInterface by lazy {
+        MockMovieDataRepository(appContext, R.drawable.vector_background)
     }
 }

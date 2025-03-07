@@ -1,4 +1,4 @@
-package com.example.hotmovies.presentation.shared
+package com.example.hotmovies.presentation
 
 import android.app.Activity
 import android.app.Application
@@ -6,11 +6,13 @@ import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.hotmovies.appplication.DIContainer
-import com.example.hotmovies.presentation.shared.KeyboardStateAwareComponent.KeyboardState
+import com.example.hotmovies.presentation.KeyboardStateAwareComponent.KeyboardState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -50,6 +52,13 @@ class CustomApplication : Application(), ActivityLifecycleCallbacks, KeyboardSta
     }
 
     override fun onActivityCreated(activity: Activity, p1: Bundle?) {
+        (activity as AppCompatActivity).apply {
+            enableEdgeToEdge()
+            if (Build.VERSION.SDK_INT >= 29) {
+                window.isNavigationBarContrastEnforced = true
+            }
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             activity.setRecentsScreenshotEnabled(false)
         }
@@ -82,7 +91,7 @@ class CustomApplication : Application(), ActivityLifecycleCallbacks, KeyboardSta
         }
     }
 
-    override fun onActivityStarted(p0: Activity) {}
+    override fun onActivityStarted(activity: Activity) {}
     override fun onActivityResumed(p0: Activity) {}
     override fun onActivityPaused(p0: Activity) {}
     override fun onActivityStopped(p0: Activity) {}

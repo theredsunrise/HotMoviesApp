@@ -6,12 +6,12 @@ import com.example.hotmovies.appplication.DIContainer
 import com.example.hotmovies.domain.LoginPassword
 import com.example.hotmovies.domain.LoginUserName
 import com.example.hotmovies.presentation.shared.UIControlState
-import com.example.hotmovies.shared.Async
 import com.example.hotmovies.shared.Event
-import com.example.hotmovies.shared.asyncEvent
-import com.example.hotmovies.shared.asyncEventFailure
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.progressEvent
+import com.example.hotmovies.shared.stateEvent
+import com.example.hotmovies.shared.stateEventFailure
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -26,7 +26,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
         val passwordText: UIControlState,
         val loginButton: UIControlState,
         val isScreenEnabled: Boolean,
-        val loginAction: Event<Async<Boolean>>
+        val loginAction: Event<ResultState<Boolean>>
     ) {
         companion object {
             fun defaultState() = UIState(
@@ -34,7 +34,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
                 UIControlState.enabled(),
                 UIControlState.disabled(),
                 true,
-                false.asyncEvent()
+                false.stateEvent()
             )
         }
     }
@@ -50,7 +50,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()
 
-    private val loginAction = LoginAction(diContainer, viewModelScope)
+    private val loginAction = LoginAction(viewModelScope, diContainer)
 
     init {
         combine(userNameText, passwordText) { userName, password ->
@@ -79,7 +79,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
                 passwordText = UIControlState.enabled(),
                 loginButton = it.loginButton.copy(isEnabled = isEnabled),
                 isScreenEnabled = true,
-                loginAction = false.asyncEvent(),
+                loginAction = false.stateEvent(),
             )
         }
     }
@@ -93,24 +93,24 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
         }
     }
 
-    private fun processLogin(result: Async<Unit>) {
+    private fun processLogin(result: ResultState<Unit>) {
         checkMainThread()
         when (result) {
-            is Async.Progress -> _state.update {
+            is ResultState.Progress -> _state.update {
                 it.copy(
                     isScreenEnabled = false,
                     loginAction = progressEvent
                 )
             }
 
-            is Async.Success -> _state.update {
+            is ResultState.Success -> _state.update {
                 it.copy(
                     isScreenEnabled = true,
-                    loginAction = true.asyncEvent()
+                    loginAction = true.stateEvent()
                 )
             }
 
-            is Async.Failure -> {
+            is ResultState.Failure -> {
                 val exception = result.exception
                 var userNameText = _state.value.userNameText
                 var passwordText = _state.value.passwordText
@@ -129,7 +129,7 @@ class LoginViewModel(diContainer: DIContainer) : ViewModel() {
                         userNameText = userNameText,
                         passwordText = passwordText,
                         isScreenEnabled = true,
-                        loginAction = exception.asyncEventFailure()
+                        loginAction = exception.stateEventFailure()
                     )
                 }
             }

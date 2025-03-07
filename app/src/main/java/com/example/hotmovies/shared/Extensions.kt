@@ -17,21 +17,16 @@ import androidx.constraintlayout.motion.widget.TransitionAdapter
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.paging.LoadState
+import com.example.hotmovies.presentation.CustomApplication
+import com.example.hotmovies.presentation.KeyboardStateAwareComponent
+import com.example.hotmovies.presentation.KeyboardStateAwareComponent.KeyboardState
 import com.example.hotmovies.presentation.UserInteractionConfigurableComponent
-import com.example.hotmovies.presentation.shared.CustomApplication
-import com.example.hotmovies.presentation.shared.KeyboardStateAwareComponent
-import com.example.hotmovies.presentation.shared.KeyboardStateAwareComponent.KeyboardState
 import com.example.hotmovies.presentation.shared.layouts.CustomMotionLayout
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.ResponseBody
 import kotlin.coroutines.resume
@@ -70,13 +65,6 @@ suspend fun View.doOnLayoutAsync(): Unit = suspendCancellableCoroutine { continu
         }
     }
 }
-
-suspend fun View.doOnPreDrawAsync(): Unit =
-    suspendCancellableCoroutine { continuation ->
-        doOnPreDraw {
-            continuation.resume(Unit)
-        }
-    }
 
 suspend fun CustomMotionLayout.transitionToEndAsync(immediately: Boolean): Unit =
     suspendCancellableCoroutine { continuation ->
@@ -192,14 +180,6 @@ val LoadState.failure: Throwable? get() = (this as? LoadState.Error)?.let { it.e
 
 fun <V : View> Set<V>.toPairs(): Array<Pair<V, String>> {
     return map { Pair(it, it.transitionName) }.toTypedArray()
-}
-
-fun LifecycleOwner.launchOnStartedState(block: suspend () -> Unit) {
-    val owner = this
-    this.lifecycleScope.launch(Dispatchers.Main.immediate) {
-        if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@launch
-        block()
-    }
 }
 
 fun NavController.safeNavigation(

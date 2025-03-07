@@ -10,9 +10,12 @@
         <item name="android:textColor">@color/colorPrimaryInverted</item>
         <item name="colorPrimary">@color/colorPrimaryInverted</item>
         <item name="colorSecondary">@color/colorPrimaryInverted</item>
+        <item name="colorOnSurfaceVariant">@color/colorPrimaryInverted</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryInverted</item>
         <item name="colorPrimaryDark">@color/colorPrimaryInverted</item>
         <item name="colorAccent">@color/colorPrimaryInverted</item>
+        <item name="colorOutline">@color/colorPrimaryInverted</item>
+        <item name="colorOutlineVariant">@color/colorPrimaryInverted</item>
         <item name="colorControlNormal">@color/colorPrimaryInverted</item>
         <item name="android:colorControlActivated">@color/colorPrimaryInverted</item>
         <item name="android:colorControlNormal">@color/colorPrimaryInverted</item>
@@ -20,16 +23,15 @@
         <item name="colorOnError">@color/colorPrimaryInverted</item>
         <item name="colorOnContainer">@color/colorPrimaryInverted</item>
         <item name="colorOnSurface">@color/colorPrimaryInverted</item>
-
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowContentOverlay">@null</item>
 
-        <item name="android:windowSharedElementsUseOverlay">true</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout.Custom</item>
         <item name="editTextStyle">@style/Widget.Design.TextInputEditText.Custom</item>
         <item name="materialButtonStyle">@style/Widget.Design.Button.Custom</item>
@@ -45,8 +47,8 @@
     </style>
 
     <style name="Widget.Design.TextInputLayout.Custom" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.TextInputEditText.Custom
-        </item>
+        <item name="materialThemeOverlay">@null</item>
+        <item name="editTextStyle">@style/Widget.Design.TextInputEditText.Custom</item>
         <item name="boxStrokeWidth">2dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
         <item name="cursorColor">@color/colorPrimaryInverted</item>
@@ -55,6 +57,9 @@
         <item name="boxCornerRadiusTopEnd">10dp</item>
         <item name="boxCornerRadiusBottomEnd">10dp</item>
         <item name="boxBackgroundColor">@color/colorPrimary</item>
+
+        <item name="hintTextColor">@color/colorPrimaryInverted</item>
+        <item name="textOutlineColor">@color/colorPrimaryInverted</item>
         <item name="counterTextAppearance">
             @style/Widget.Design.TextInputLayout.TextAppearance.Custom
         </item>
@@ -75,28 +80,33 @@
         </item>
     </style>
 
-    <style name="ThemeOverlay.Material3.TextInputEditText.Custom" parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox">
-        <item name="editTextStyle">@style/Widget.Design.TextInputEditText.Custom</item>
-    </style>
 
-    <style name="Widget.Design.TextInputEditText.Custom" parent="Base.Widget.MaterialComponents.TextInputEditText">
-        <item name="android:textSize">20sp</item>
+    <style name="Widget.Design.TextInputEditText.Custom" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:textAppearance">
+            @style/Widget.Design.TextInputLayout.TextAppearance.Custom
+        </item>
+        <item name="android:textColor">@color/colorPrimaryInverted</item>
+        <item name="android:textColorHint">@color/colorPrimaryInverted</item>
     </style>
 
     <style name="Widget.Design.TextInputLayout.TextAppearance.Custom" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/colorPrimaryInverted</item>
     </style>
 
     <style name="Widget.Design.TextInputLayout.Hint.TextAppearance.Custom" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/colorPrimaryInverted</item>
     </style>
 
     <style name="Widget.Design.TextInputLayout.Error.TextAppearance.Custom" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorPrimaryInverted</item>
     </style>
 
     <style name="Widget.Design.Button.Custom" parent="Widget.Material3.Button">
         <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
     <style name="Widget.RatingBar.Small.custom" parent="Widget.AppCompat.RatingBar.Small">

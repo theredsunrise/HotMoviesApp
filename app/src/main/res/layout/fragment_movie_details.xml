@@ -122,7 +122,7 @@
                 android:focusable="false"
                 android:indeterminate="true"
                 android:longClickable="false"
-                android:visibility="@{layoutViewModel.state.loadAction.content.progress ? View.VISIBLE : View.GONE}"
+                android:visibility="visible"
                 app:indicatorColor="@color/colorPrimaryInverted"
                 app:layout_constraintBottom_toBottomOf="@id/posterImageContainer"
                 app:layout_constraintEnd_toEndOf="@id/posterImageContainer"

@@ -15,13 +15,13 @@ import com.example.hotmovies.presentation.movies.list.viewModel.actions.LogoutAc
 import com.example.hotmovies.presentation.movies.list.viewModel.actions.MoviesAction
 import com.example.hotmovies.presentation.movies.list.viewModel.actions.UserDetailsAction
 import com.example.hotmovies.presentation.shared.viewModels.CustomViewModel
-import com.example.hotmovies.shared.Async
 import com.example.hotmovies.shared.Event
-import com.example.hotmovies.shared.asyncEvent
-import com.example.hotmovies.shared.asyncEventFailure
+import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.progress
 import com.example.hotmovies.shared.progressEvent
+import com.example.hotmovies.shared.stateEvent
+import com.example.hotmovies.shared.stateEventFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,18 +58,72 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
     data class UIState(
         val userDetails: UserDetailsUIState,
         var movieDetailAction: Event<Boolean>,
-        val loadAction: Event<Async<Boolean>>,
-        val logoutAction: Event<Async<Boolean>>
+        val userDetailsAction: Event<ResultState<Boolean>>,
+        val logoutAction: Event<ResultState<Boolean>>
     ) {
         companion object {
             fun defaultState() =
                 UIState(
                     UserDetailsUIState.defaultState(),
                     Event(false),
-                    false.asyncEvent(),
-                    false.asyncEvent()
+                    false.stateEvent(),
+                    false.stateEvent()
                 )
         }
+    }
+
+    private val resources = diContainer.appContext.resources
+    private val logoutAction = LogoutAction(viewModelScope, diContainer)
+    private val moviesAction = MoviesAction(viewModelScope, diContainer, viewModelScope)
+    private val userDetailsAction = UserDetailsAction(viewModelScope, diContainer)
+
+    private var _state = MutableStateFlow(UIState.defaultState())
+    val state = _state.asStateFlow()
+    val moviesPagingData: Flow<PagingData<Movie>> = moviesAction.state
+
+    init {
+        userDetailsAction.state.onEach { result ->
+            checkMainThread()
+            when (result) {
+                is ResultState.Success -> {
+                    _state.update {
+                        it.copy(
+                            userDetails = UserDetailsUIState.fromDomain(
+                                resources,
+                                result.value
+                            ),
+                            userDetailsAction = true.stateEvent()
+                        )
+                    }
+
+                }
+
+                is progress -> _state.update { it.copy(userDetailsAction = progressEvent) }
+                is ResultState.Failure -> _state.update { it.copy(userDetailsAction = result.exception.stateEventFailure()) }
+            }
+        }.launchIn(viewModelScope)
+
+        logoutAction.state.onEach { result ->
+            checkMainThread()
+            when (result) {
+                is ResultState.Success -> {
+                    _state.update {
+                        it.copy(
+                            logoutAction = true.stateEvent()
+                        )
+                    }
+                }
+
+                is progress -> _state.update {
+                    it.copy(
+                        userDetailsAction = progressEvent,
+                        logoutAction = progressEvent
+                    )
+                }
+
+                is ResultState.Failure -> _state.update { it.copy(logoutAction = result.exception.stateEventFailure()) }
+            }
+        }.launchIn(viewModelScope)
     }
 
     sealed interface Actions {
@@ -77,60 +131,6 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
         data object LoadUserDetails : Actions
         data object LoadMovies : Actions
         data object Logout : Actions
-    }
-
-    private val resources = diContainer.appContext.resources
-    private val logoutAction = LogoutAction(diContainer, viewModelScope)
-    private val moviesAction = MoviesAction(diContainer, viewModelScope, viewModelScope)
-    private val userDetailsAction = UserDetailsAction(diContainer, viewModelScope)
-
-    private var _state = MutableStateFlow(UIState.defaultState())
-    val state = _state.asStateFlow()
-    val adapterMoviesFlow: Flow<PagingData<Movie>> = moviesAction.state
-
-    init {
-        userDetailsAction.state.onEach { result ->
-            checkMainThread()
-            when (result) {
-                is Async.Success -> {
-                    _state.update {
-                        it.copy(
-                            userDetails = UserDetailsUIState.fromDomain(
-                                resources,
-                                result.value
-                            ),
-                            loadAction = true.asyncEvent()
-                        )
-                    }
-
-                }
-
-                is progress -> _state.update { it.copy(loadAction = progressEvent) }
-                is Async.Failure -> _state.update { it.copy(loadAction = result.exception.asyncEventFailure()) }
-            }
-        }.launchIn(viewModelScope)
-
-        logoutAction.state.onEach { result ->
-            checkMainThread()
-            when (result) {
-                is Async.Success -> {
-                    _state.update {
-                        it.copy(
-                            logoutAction = true.asyncEvent()
-                        )
-                    }
-                }
-
-                is progress -> _state.update {
-                    it.copy(
-                        loadAction = progressEvent,
-                        logoutAction = progressEvent
-                    )
-                }
-
-                is Async.Failure -> _state.update { it.copy(logoutAction = result.exception.asyncEventFailure()) }
-            }
-        }.launchIn(viewModelScope)
     }
 
     fun doAction(action: Actions) {
@@ -149,9 +149,5 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
             is LoadUserDetails -> userDetailsAction.run(Unit)
             is Logout -> logoutAction.run(Unit)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }

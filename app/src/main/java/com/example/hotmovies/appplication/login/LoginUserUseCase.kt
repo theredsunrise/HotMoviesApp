@@ -4,8 +4,8 @@ import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterf
 import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
 import com.example.hotmovies.domain.LoginPassword
 import com.example.hotmovies.domain.LoginUserName
-import com.example.hotmovies.shared.Async
-import com.example.hotmovies.shared.asResult
+import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.asStateResult
 import com.example.hotmovies.shared.checkNotMainThread
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ class LoginUserUseCase(
     data class Credentials(val userName: String, val password: String)
     data class CredentialsInternal(val userName: LoginUserName, val password: LoginPassword)
 
-    operator fun invoke(credentials: Credentials): Flow<Async<Unit>> = flow {
+    operator fun invoke(credentials: Credentials): Flow<ResultState<Unit>> = flow {
         checkNotMainThread()
         val userName = LoginUserName.invoke(credentials.userName)
         val password = LoginPassword.invoke(credentials.password)
@@ -42,5 +42,5 @@ class LoginUserUseCase(
             token
         )
 
-    }.asResult().flowOn(dispatcher)
+    }.asStateResult().flowOn(dispatcher)
 }

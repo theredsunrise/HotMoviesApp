@@ -1,4 +1,4 @@
-package com.example.hotmovies.infrastructure.dataRepository
+package com.example.hotmovies.appplication.movies.interfaces
 
 import com.example.hotmovies.domain.MovieDetails
 import com.example.hotmovies.domain.MoviesInfo
