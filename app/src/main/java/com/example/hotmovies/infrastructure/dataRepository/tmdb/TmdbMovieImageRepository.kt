@@ -2,6 +2,7 @@ package com.example.hotmovies.infrastructure.dataRepository.tmdb
 
 import android.graphics.Bitmap
 import com.example.hotmovies.appplication.login.interfaces.MovieImageRepositoryInterface
+import com.example.hotmovies.appplication.login.interfaces.MovieImageRepositoryInterface.Exceptions
 import com.example.hotmovies.infrastructure.dataRepository.HttpMapper
 import com.example.hotmovies.shared.checkNotMainThread
 import com.example.hotmovies.shared.toBitmap
@@ -10,11 +11,8 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import java.io.InputStream
 
-class TmdbMovieImageRepository(private val imageApiService: com.example.hotmovies.infrastructure.dataRepository.tmdb.TmdbMovieImageApiInterface) :
+class TmdbMovieImageRepository(private val imageApiService: TmdbMovieImageApiInterface) :
     MovieImageRepositoryInterface {
-    sealed class Exceptions(msg: String) : Exception(msg) {
-        class HttpException(msg: String) : Exceptions(msg)
-    }
 
     override fun getImage(id: String): InputStream {
         checkNotMainThread()

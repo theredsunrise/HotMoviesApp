@@ -68,7 +68,8 @@ class ProcessMovies(
     private fun processLoadMoviesAction(groupedState: Pair<PagingData<Movie>, Event<ResultState<Boolean>>>) {
         val pagingData = with(groupedState) {
             val (movies, logoutAction) = groupedState
-            val showLoading = with(logoutAction.content) { isSuccessTrue || isProgress || isFailure }
+            val showLoading =
+                with(logoutAction.content) { isSuccessTrue || isProgress || isFailure }
             if (showLoading) {
                 val loadStates = LoadStates(
                     Loading,
