@@ -11,6 +11,9 @@ class LoginViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return LoginViewModel(diContainer) as T
+        return LoginViewModel(
+            diContainer.loginRepository,
+            diContainer.settingsRepository
+        ) as T
     }
 }

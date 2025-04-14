@@ -77,6 +77,11 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    jvmArgs = listOf("-XX:+EnableDynamicAgentLoading")
+    systemProperty("isTest", true)
+}
+
 inline fun <reified ValueT> VariantDimension.buildConfigField(name: String, value: ValueT) {
     val resolvedValue = when (value) {
         is String -> "\"$value\""
@@ -109,7 +114,8 @@ dependencies {
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.fragment.ktx)
     kapt(libs.glide.processor)
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutine.tests)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

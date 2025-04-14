@@ -3,9 +3,12 @@ package com.example.hotmovies.presentation.movies.list.viewModel
 import android.content.res.Resources
 import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
 import androidx.paging.PagingData
 import com.example.hotmovies.R
-import com.example.hotmovies.appplication.DIContainer
+import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
+import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
+import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.domain.User
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
@@ -29,7 +32,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
-class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
+class MoviesViewModel(
+    resources: Resources,
+    moviePager: Pager<Int, Movie>,
+    loginRepository: LoginRepositoryInterface,
+    settingsRepository: SettingsRepositoryInterface,
+    movieDataRepository: MovieDataRepositoryInterface
+) : CustomViewModel() {
 
     data class UserDetailsUIState(
         val name: String,
@@ -72,10 +81,9 @@ class MoviesViewModel(diContainer: DIContainer) : CustomViewModel() {
         }
     }
 
-    private val resources = diContainer.appContext.resources
-    private val logoutAction = LogoutAction(viewModelScope, diContainer)
-    private val moviesAction = MoviesAction(viewModelScope, diContainer, viewModelScope)
-    private val userDetailsAction = UserDetailsAction(viewModelScope, diContainer)
+    private val logoutAction = LogoutAction(viewModelScope, loginRepository, settingsRepository)
+    private val moviesAction = MoviesAction(viewModelScope, moviePager, viewModelScope)
+    private val userDetailsAction = UserDetailsAction(viewModelScope, movieDataRepository)
 
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()

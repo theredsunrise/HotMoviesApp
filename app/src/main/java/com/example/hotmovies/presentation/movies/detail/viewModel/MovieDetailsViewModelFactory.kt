@@ -10,6 +10,6 @@ class MovieDetailsViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MovieDetailsViewModel(diContainer) as T
+        return MovieDetailsViewModel(diContainer.movieDataRepository) as T
     }
 }

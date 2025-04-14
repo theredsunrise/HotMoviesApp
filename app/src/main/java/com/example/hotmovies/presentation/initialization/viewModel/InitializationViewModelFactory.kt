@@ -3,6 +3,7 @@ package com.example.hotmovies.presentation.initialization.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hotmovies.appplication.DIContainer
+import kotlinx.coroutines.Dispatchers
 
 class InitializationViewModelFactory(
     private val diContainer: DIContainer
@@ -10,6 +11,10 @@ class InitializationViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return InitializationViewModel(diContainer) as T
+        return InitializationViewModel(
+            diContainer.loginRepository,
+            diContainer.settingsRepository,
+            Dispatchers.IO
+        ) as T
     }
 }

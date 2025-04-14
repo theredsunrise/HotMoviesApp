@@ -10,7 +10,13 @@ class MoviesViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MoviesViewModel(diContainer) as T
+        return MoviesViewModel(
+            diContainer.appContext.resources,
+            diContainer.pager,
+            diContainer.loginRepository,
+            diContainer.settingsRepository,
+            diContainer.movieDataRepository
+        ) as T
     }
 }
 

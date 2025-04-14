@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.flowOn
 class SessionValidityUseCase(
     private val loginRepository: LoginRepositoryInterface,
     private val settingsRepository: SettingsRepositoryInterface,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher
 ) {
 
     operator fun invoke(): Flow<ResultState<Boolean>> =
         settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY)
             .flatMapLatest { token ->
                 checkNotMainThread()
-                loginRepository.isSessionExpired(token)
+                loginRepository.isSessionValid(token)
             }
             .catch { e ->
                 if (e !is SettingsRepositoryInterface.Exceptions.NoValueException) throw e

@@ -61,6 +61,7 @@ fun <T> T.state(): ResultState.Success<T> = ResultState.Success(this)
 fun <T> T.stateEvent(): Event<ResultState.Success<T>> = Event(ResultState.Success(this))
 fun Exception.stateFailure() = ResultState.Failure(this)
 fun Exception.stateEventFailure() = Event(ResultState.Failure(this))
+
 typealias progress = ResultState.Progress
 
 val progressEvent: Event<ResultState.Progress> get() = Event(progress)

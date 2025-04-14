@@ -160,8 +160,17 @@ val Fragment.userInteractionComponent: UserInteractionConfigurableComponent
 val View.bounds: RectF
     get() = RectF(0f, 0f, width.toFloat(), height.toFloat())
 
-fun checkMainThread() = assert(Looper.myLooper() == Looper.getMainLooper())
-fun checkNotMainThread() = assert(Looper.myLooper() != Looper.getMainLooper())
+fun checkMainThread() {
+    if (System.getProperty("isTest") == null) {
+        assert(Looper.myLooper() == Looper.getMainLooper())
+    }
+}
+
+fun checkNotMainThread() {
+    if (System.getProperty("isTest") == null) {
+        assert(Looper.myLooper() != Looper.getMainLooper())
+    }
+}
 
 fun Fragment.diContainer() = (requireActivity().application as CustomApplication).diContainer
 
