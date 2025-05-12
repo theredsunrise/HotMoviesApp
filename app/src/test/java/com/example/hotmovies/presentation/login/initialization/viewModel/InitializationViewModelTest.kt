@@ -1,6 +1,7 @@
 package com.example.hotmovies.presentation.login.initialization.viewModel
 
 import TestException
+import com.example.hotmovies.appplication.login.SessionValidityUseCase
 import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
 import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel
@@ -8,9 +9,10 @@ import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
 import common.MainDispatcherRule
 import io.mockk.coEvery
-import io.mockk.coVerifyAll
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
+import io.mockk.verify
+import io.mockk.verifyAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -57,6 +59,10 @@ class InitializationViewModelTest {
         } returns flowOf(Unit)
 
         val results = listenToStatesOfViewModel()
+        verifyAll {
+            loginRepository.isSessionValid(any())
+            settingsRepository.getStringValue(any())
+        }
 
         assertTrue(
             "Should be Progress",
@@ -66,11 +72,6 @@ class InitializationViewModelTest {
             "Should be Success with True",
             results[1].getContentIfNotHandled()?.success == true
         )
-
-        coVerifyAll {
-            loginRepository.isSessionValid(any())
-            settingsRepository.getStringValue(any())
-        }
     }
 
     @Test
@@ -90,6 +91,11 @@ class InitializationViewModelTest {
 
         val results = listenToStatesOfViewModel()
 
+        verifyAll {
+            loginRepository.isSessionValid(any())
+            settingsRepository.getStringValue(any())
+        }
+
         assertTrue(
             "Should be Progress",
             results[0].getContentIfNotHandled() == ResultState.Progress
@@ -98,18 +104,11 @@ class InitializationViewModelTest {
             "Should be Success with False",
             results[1].getContentIfNotHandled()?.success == false
         )
-
-        coVerifyAll {
-            loginRepository.isSessionValid(any())
-            settingsRepository.getStringValue(any())
-        }
     }
 
     @Test
     fun `session validity, check if the login session is valid, throws error`() = runTest {
-
         coEvery { loginRepository.isSessionValid(token) } throws testException
-
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns flowOf(
             token
         )
@@ -122,6 +121,11 @@ class InitializationViewModelTest {
 
         val results = listenToStatesOfViewModel()
 
+        verifyAll {
+            loginRepository.isSessionValid(any())
+            settingsRepository.getStringValue(any())
+        }
+
         assertTrue(
             "Should be Progress",
             results[0].getContentIfNotHandled() == ResultState.Progress
@@ -130,18 +134,10 @@ class InitializationViewModelTest {
             "Should be Failure",
             results[1].getContentIfNotHandled()?.failure == testException
         )
-
-        coVerifyAll {
-            loginRepository.isSessionValid(any())
-            settingsRepository.getStringValue(any())
-        }
     }
 
     @Test
-    fun `session validity, stored token was not found, fails`() = runTest {
-
-        coEvery { loginRepository.isSessionValid(token) } returns flowOf(true)
-
+    fun `session validity, stored token was not found, failed`() = runTest {
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns
                 flow {
                     throw SettingsRepositoryInterface.Exceptions.NoValueException(
@@ -159,6 +155,10 @@ class InitializationViewModelTest {
 
         val results = listenToStatesOfViewModel()
 
+        verify {
+            settingsRepository.getStringValue(any())
+        }
+
         assertTrue(
             "Should be Progress",
             results[0].getContentIfNotHandled() == ResultState.Progress
@@ -167,17 +167,10 @@ class InitializationViewModelTest {
             "Should be Failure",
             results[1].getContentIfNotHandled()?.success == false
         )
-
-        coVerifyAll {
-            settingsRepository.getStringValue(any())
-        }
     }
 
     @Test
     fun `session validity, failed to fetch the stored token, throws error`() = runTest {
-
-        coEvery { loginRepository.isSessionValid(token) } returns flowOf(true)
-
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns
                 flow {
                     throw testException
@@ -192,6 +185,10 @@ class InitializationViewModelTest {
 
         val results = listenToStatesOfViewModel()
 
+        verify {
+            settingsRepository.getStringValue(any())
+        }
+
         assertTrue(
             "Should be Progress",
             results[0].getContentIfNotHandled() == ResultState.Progress
@@ -200,18 +197,16 @@ class InitializationViewModelTest {
             "Should be Failure",
             results[1].getContentIfNotHandled()?.failure == testException
         )
-
-        coVerifyAll {
-            settingsRepository.getStringValue(any())
-        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun TestScope.listenToStatesOfViewModel(): MutableList<Event<ResultState<Boolean>>> {
         val viewModel = InitializationViewModel(
-            loginRepository,
-            settingsRepository,
-            mainDispatcherRule.testDispatcher
+            SessionValidityUseCase(
+                loginRepository,
+                settingsRepository,
+                mainDispatcherRule.testDispatcher
+            )
         )
 
         val results = mutableListOf<Event<ResultState<Boolean>>>()

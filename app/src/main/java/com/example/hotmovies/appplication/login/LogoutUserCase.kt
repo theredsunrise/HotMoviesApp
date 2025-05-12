@@ -5,7 +5,6 @@ import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInt
 import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.asStateResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -14,7 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 class LogoutUserCase(
     private val loginRepository: LoginRepositoryInterface,
     private val settingsRepository: SettingsRepositoryInterface,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)

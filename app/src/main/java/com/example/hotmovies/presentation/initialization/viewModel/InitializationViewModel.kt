@@ -2,23 +2,15 @@ package com.example.hotmovies.presentation.initialization.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
-import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
+import com.example.hotmovies.appplication.login.SessionValidityUseCase
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel.Actions.CheckSessionValidity
 import com.example.hotmovies.presentation.initialization.viewModel.actions.SessionValidityAction
-import kotlinx.coroutines.CoroutineDispatcher
 
-class InitializationViewModel(
-    loginRepository: LoginRepositoryInterface,
-    settingsRepository: SettingsRepositoryInterface,
-    dispatcher: CoroutineDispatcher
-) :
+class InitializationViewModel(useCase: SessionValidityUseCase) :
     ViewModel() {
     private val sessionValidityAction = SessionValidityAction(
         viewModelScope,
-        loginRepository,
-        settingsRepository,
-        dispatcher
+        useCase
     ) {
         doAction(CheckSessionValidity)
     }

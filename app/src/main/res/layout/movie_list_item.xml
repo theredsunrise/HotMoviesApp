@@ -10,9 +10,9 @@
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:elevation="0dp"
-        app:strokeWidth="0.7dp"
         app:cardBackgroundColor="@color/colorPrimaryInverted"
-        app:shapeAppearanceOverlay="@style/RoundedSquare">
+        app:shapeAppearanceOverlay="@style/RoundedSquare"
+        app:strokeWidth="0.7dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

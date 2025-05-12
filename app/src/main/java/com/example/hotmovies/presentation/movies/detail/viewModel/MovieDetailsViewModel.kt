@@ -1,7 +1,7 @@
 package com.example.hotmovies.presentation.movies.detail.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
+import com.example.hotmovies.appplication.movies.MovieDetailsUseCase
 import com.example.hotmovies.domain.MovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Actions.LoadMovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.actions.MovieDetailsAction
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
-class MovieDetailsViewModel(movieDataRepository: MovieDataRepositoryInterface) : CustomViewModel() {
+class MovieDetailsViewModel(useCase: MovieDetailsUseCase) : CustomViewModel() {
 
     data class MovieDetailsUIState(
         val title: String,
@@ -51,7 +51,7 @@ class MovieDetailsViewModel(movieDataRepository: MovieDataRepositoryInterface) :
     }
 
     private val movieDetailsAction =
-        MovieDetailsAction(viewModelScope, movieDataRepository)
+        MovieDetailsAction(viewModelScope, useCase)
 
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()

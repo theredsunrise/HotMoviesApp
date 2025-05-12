@@ -3,6 +3,9 @@ package com.example.hotmovies.presentation.movies.list.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hotmovies.appplication.DIContainer
+import com.example.hotmovies.appplication.login.LogoutUserCase
+import com.example.hotmovies.appplication.movies.interfaces.UserDetailsUseCase
+import kotlinx.coroutines.Dispatchers
 
 class MoviesViewModelFactory(
     private val diContainer: DIContainer
@@ -13,9 +16,10 @@ class MoviesViewModelFactory(
         return MoviesViewModel(
             diContainer.appContext.resources,
             diContainer.pager,
-            diContainer.loginRepository,
-            diContainer.settingsRepository,
-            diContainer.movieDataRepository
+            UserDetailsUseCase(diContainer.movieDataRepository, Dispatchers.IO),
+            LogoutUserCase(
+                diContainer.loginRepository, diContainer.settingsRepository, Dispatchers.IO
+            )
         ) as T
     }
 }

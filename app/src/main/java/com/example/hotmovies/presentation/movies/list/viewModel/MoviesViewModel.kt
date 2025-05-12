@@ -6,9 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import com.example.hotmovies.R
-import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
-import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
-import com.example.hotmovies.appplication.movies.interfaces.MovieDataRepositoryInterface
+import com.example.hotmovies.appplication.login.LogoutUserCase
+import com.example.hotmovies.appplication.movies.interfaces.UserDetailsUseCase
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.domain.User
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
@@ -35,9 +34,8 @@ import kotlinx.coroutines.flow.update
 class MoviesViewModel(
     resources: Resources,
     moviePager: Pager<Int, Movie>,
-    loginRepository: LoginRepositoryInterface,
-    settingsRepository: SettingsRepositoryInterface,
-    movieDataRepository: MovieDataRepositoryInterface
+    userDetailsUseCase: UserDetailsUseCase,
+    logoutUseCase: LogoutUserCase,
 ) : CustomViewModel() {
 
     data class UserDetailsUIState(
@@ -81,9 +79,10 @@ class MoviesViewModel(
         }
     }
 
-    private val logoutAction = LogoutAction(viewModelScope, loginRepository, settingsRepository)
+    private val logoutAction =
+        LogoutAction(viewModelScope, logoutUseCase)
     private val moviesAction = MoviesAction(viewModelScope, moviePager, viewModelScope)
-    private val userDetailsAction = UserDetailsAction(viewModelScope, movieDataRepository)
+    private val userDetailsAction = UserDetailsAction(viewModelScope, userDetailsUseCase)
 
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()

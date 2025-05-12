@@ -2,8 +2,7 @@ package com.example.hotmovies.presentation.login.viewModel.actions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hotmovies.appplication.login.interfaces.LoginRepositoryInterface
-import com.example.hotmovies.appplication.login.interfaces.SettingsRepositoryInterface
+import com.example.hotmovies.appplication.login.LoginUserUseCase
 import com.example.hotmovies.domain.LoginPassword
 import com.example.hotmovies.domain.LoginUserName
 import com.example.hotmovies.presentation.shared.UIControlState
@@ -20,10 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
-class LoginViewModel(
-    loginRepository: LoginRepositoryInterface,
-    settingsRepository: SettingsRepositoryInterface,
-) : ViewModel() {
+class LoginViewModel(useCase: LoginUserUseCase) : ViewModel() {
 
     data class UIState(
         val userNameText: UIControlState,
@@ -54,7 +50,7 @@ class LoginViewModel(
     private var _state = MutableStateFlow(UIState.defaultState())
     val state = _state.asStateFlow()
 
-    private val loginAction = LoginAction(viewModelScope, loginRepository, settingsRepository)
+    private val loginAction = LoginAction(viewModelScope, useCase)
 
     init {
         combine(userNameText, passwordText) { userName, password ->

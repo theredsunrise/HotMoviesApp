@@ -1,5 +1,7 @@
 import com.android.build.api.dsl.VariantDimension
 import com.example.shared.encrypt
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -51,6 +53,24 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+    }
+
+    testOptions {
+        this.unitTests.all {
+            it.testLogging {
+                events(
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_ERROR,
+                    TestLogEvent.STANDARD_OUT
+                )
+                exceptionFormat = TestExceptionFormat.FULL
+                showCauses = true
+                showExceptions = true
+                showStackTraces = true
+            }
+        }
     }
 
     buildTypes {

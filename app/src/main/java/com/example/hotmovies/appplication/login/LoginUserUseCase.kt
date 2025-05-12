@@ -8,7 +8,6 @@ import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.asStateResult
 import com.example.hotmovies.shared.checkNotMainThread
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -19,7 +18,7 @@ import kotlinx.coroutines.flow.flowOn
 class LoginUserUseCase(
     private val loginRepository: LoginRepositoryInterface,
     private val settingsRepository: SettingsRepositoryInterface,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val dispatcher: CoroutineDispatcher
 ) {
 
     data class Credentials(val userName: String, val password: String)
@@ -27,8 +26,8 @@ class LoginUserUseCase(
 
     operator fun invoke(credentials: Credentials): Flow<ResultState<Unit>> = flow {
         checkNotMainThread()
-        val userName = LoginUserName.invoke(credentials.userName)
-        val password = LoginPassword.invoke(credentials.password)
+        val userName = LoginUserName(credentials.userName)
+        val password = LoginPassword(credentials.password)
         emit(CredentialsInternal(userName, password))
 
     }.flatMapLatest { entity ->
