@@ -5,7 +5,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.hotmovies.R
 import com.example.hotmovies.presentation.movies.list.MoviesFragmentDirections
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.Logout
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.Logout
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.presentation.shared.helpers.FragmentExitDialogHandler
@@ -50,12 +50,12 @@ class ProcessUserLogout(
                 if (action is Accept) else {
                     return@exit
                 }
-                moviesViewModel.doAction(Logout)
+                moviesViewModel.sendIntent(Logout)
             }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
             exitDialogHandler.state.collect {
-                moviesViewModel.doAction(Logout)
+                moviesViewModel.sendIntent(Logout)
             }
         }
     }

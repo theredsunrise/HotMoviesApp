@@ -23,7 +23,7 @@ import com.example.hotmovies.appplication.movies.MovieImageModel
 import com.example.hotmovies.databinding.FragmentMovieDetailsBinding
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel
-import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Actions.LoadMovieDetails
+import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Intents.LoadMovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.UIState
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
@@ -48,7 +48,7 @@ class MovieDetailsFragment : Fragment() {
 
     private val args: MovieDetailsFragmentArgs by navArgs()
     private val movieDetailsViewModel: MovieDetailsViewModel by viewModels {
-        MovieDetailsViewModelFactory(diContainer())
+        MovieDetailsViewModelFactory(this, args.toBundle(), diContainer())
     }
     private val movieDetailsDialogFactory = DialogFragmentHandler("movieDetails")
 
@@ -96,7 +96,7 @@ class MovieDetailsFragment : Fragment() {
                 }
                 launch(Dispatchers.Main.immediate) {
                     movieDetailsViewModel.state.collect { state ->
-                        processLoadingMovieDetailsAction(movie.id, state.loadAction)
+                        processLoadingMovieDetailsAction(state.loadAction)
                         processDataOfMovieDetailsAction(state)
                     }
                 }
@@ -106,7 +106,7 @@ class MovieDetailsFragment : Fragment() {
                         if (action is Accept) else {
                             return@collect
                         }
-                        movieDetailsViewModel.doAction(LoadMovieDetails(movie.id))
+                        movieDetailsViewModel.sendIntent(LoadMovieDetails(movie.id))
                     }
                 }
             }
@@ -158,14 +158,10 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
-    private fun processLoadingMovieDetailsAction(
-        movieId: Int,
-        loadAction: Event<ResultState<Boolean>>
-    ) {
+    private fun processLoadingMovieDetailsAction(loadAction: Event<ResultState<Boolean>>) {
         checkMainThread()
         val loadAction = loadAction.getContentIfNotHandled() ?: return
         when {
-            loadAction.isSuccessFalse -> movieDetailsViewModel.doAction(LoadMovieDetails(movieId))
             loadAction is ResultState.Failure -> movieDetailsDialogFactory.showErrorDialog(
                 findNavController(),
                 loadAction.exception

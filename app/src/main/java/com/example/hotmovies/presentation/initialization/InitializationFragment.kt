@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.hotmovies.R
 import com.example.hotmovies.databinding.FragmentInitializationBinding
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel
-import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel.Actions.CheckSessionValidity
+import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel.Intents.CheckSessionValidity
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Cancel
@@ -62,7 +62,7 @@ class InitializationFragment : Fragment() {
                 launch(Dispatchers.Main.immediate) {
                     errorDialogFactory.state.collect { action ->
                         when (action) {
-                            is Accept -> initializationViewModel.doAction(CheckSessionValidity)
+                            is Accept -> initializationViewModel.sendIntent(CheckSessionValidity)
                             is Cancel -> requireActivity().finish()
                             is None -> {}
                         }

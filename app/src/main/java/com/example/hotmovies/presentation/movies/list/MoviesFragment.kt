@@ -29,7 +29,7 @@ import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessM
 import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessUserDetails
 import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessUserLogout
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.ShowingMovieDetail
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.ShowingMovieDetail
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModelFactory
 import com.example.hotmovies.presentation.shared.helpers.ToolbarConfigurator
 import com.example.hotmovies.presentation.shared.imageLoaders.GlideImageLoader
@@ -110,12 +110,12 @@ class MoviesFragment : Fragment() {
             binding.motionLayout.transitionToStartAsync(true)
             binding.bindRecyclerView()
 
-            moviesViewModel.doAction(ShowingMovieDetail(false))
+            moviesViewModel.sendIntent(ShowingMovieDetail(false))
 
             viewLifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
                 processUserLogout.collect(this@repeatOnLifecycle)
-                processUserDetails.collect(this@repeatOnLifecycle)
                 processCollectingMovies.collect(this@repeatOnLifecycle)
+                processUserDetails.collect(this@repeatOnLifecycle)
             }
         }
     }
@@ -172,7 +172,7 @@ class MoviesFragment : Fragment() {
     private fun onMovieItemClicked(movie: Movie, transitionElements: Set<View>) =
         findNavController().safeNavigation(R.id.moviesFragment) {
 
-            moviesViewModel.doAction(ShowingMovieDetail(true))
+            moviesViewModel.sendIntent(ShowingMovieDetail(true))
             val navDirection =
                 MoviesFragmentDirections.actionMovieFragmentToMovieDetailFragment(movie)
             val extras = FragmentNavigatorExtras(*transitionElements.toPairs())

@@ -1,10 +1,11 @@
 package com.example.hotmovies.presentation.movies.list.uiStateProcessors
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadUserDetails
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadMovies
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadUserDetails
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.shared.Event
@@ -37,7 +38,7 @@ class ProcessUserDetails(
                 if (action is Accept) else {
                     return@exit
                 }
-                moviesViewModel.doAction(LoadUserDetails)
+                moviesViewModel.sendIntent(LoadUserDetails)
             }
         }
     }
@@ -47,8 +48,9 @@ class ProcessUserDetails(
         val loadAction = loadAction.getContentIfNotHandled() ?: return
 
         when {
-            loadAction.isSuccessTrue -> moviesViewModel.doAction(LoadMovies)
-            loadAction.isSuccessFalse -> moviesViewModel.doAction(LoadUserDetails)
+            loadAction.isSuccessTrue -> {
+                moviesViewModel.sendIntent(LoadMovies)
+            }
             loadAction is ResultState.Failure -> userDetailsDialogHandler.showErrorDialog(
                 fragment.findNavController(),
                 loadAction.exception

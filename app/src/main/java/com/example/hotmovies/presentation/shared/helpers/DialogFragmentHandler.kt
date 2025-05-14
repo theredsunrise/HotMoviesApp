@@ -46,7 +46,7 @@ class DialogFragmentHandler(private val owner: String) : DefaultLifecycleObserve
         @StringRes confirmButtonTitleId: Int = android.R.string.ok,
     ) {
         if (navController.currentDestination?.id == R.id.dialogFragment) {
-            return
+            navController.navigateUp()
         }
         navController.navigate(
             R.id.dialogFragment,

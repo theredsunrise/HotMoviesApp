@@ -11,7 +11,7 @@ import com.example.hotmovies.databinding.FragmentMoviesBinding
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.list.adapters.MoviesAdapter
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadMovies
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.shared.Event
@@ -60,7 +60,7 @@ class ProcessMovies(
                 if (action is Accept) else {
                     return@exit
                 }
-                moviesViewModel.doAction(LoadMovies)
+                moviesViewModel.sendIntent(LoadMovies)
             }
         }
     }

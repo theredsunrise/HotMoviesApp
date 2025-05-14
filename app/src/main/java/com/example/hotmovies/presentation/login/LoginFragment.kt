@@ -20,8 +20,8 @@ import com.example.hotmovies.R
 import com.example.hotmovies.databinding.FragmentLoginBinding
 import com.example.hotmovies.presentation.login.viewModel.LoginViewModelFactory
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel
-import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Actions.Animation
-import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Actions.Login
+import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Intents.Animation
+import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Intents.Login
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
 import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
@@ -118,10 +118,9 @@ class LoginFragment : Fragment() {
 
     private fun processAnimationAction(state: ResultState<LoginAnimator.TransitionState>) {
         checkMainThread()
-        loginViewModel.doAction(Animation(state.isProgress))
-
+        loginViewModel.sendIntent(Animation(state.isProgress))
         if (state.success?.isEnd == true) {
-            loginViewModel.doAction(Login)
+            loginViewModel.sendIntent(Login)
         }
     }
 

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -79,17 +80,21 @@ class LoginViewModelTest {
             loginViewModel.state
             loginViewModel.userNameText
         }
-
-        assertFalse("Login button should not be enabled!", results[1].loginButton.isEnabled)
-
+        assertFalse("Login button should not be enabled!", results[2].loginButton.isEnabled)
         confirmVerified(loginRepository, settingsRepository)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `login button, is disabled when password is empty, succeeded()`() = runTest {
+        val results = mutableListOf<LoginViewModel.UIState>()
+        backgroundScope.launch(mainDispatcherRule.testDispatcher) {
+            loginViewModel.state.toList(results)
+        }
+
         loginViewModel.passwordText.value = ""
         advanceUntilIdle()
+
         assertFalse(
             "Login button should not be enabled!",
             loginViewModel.state.value.loginButton.isEnabled
@@ -111,28 +116,26 @@ class LoginViewModelTest {
             val results = mutableListOf<LoginViewModel.UIState>()
             loginViewModel.userNameText.value = "121212981729817391741"
             loginViewModel.state.onEach { results.add(it) }.launchIn(backgroundScope)
-            loginViewModel.doAction(LoginViewModel.Actions.Login)
+            loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             advanceUntilIdle()
 
             verifyAll {
                 loginViewModel.state
                 loginViewModel.userNameText
-                loginViewModel.doAction(LoginViewModel.Actions.Login)
+                loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             }
 
             assertTrue(
                 "Should be Progress",
-                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
-
-            assertTrue(
-                "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled()?.failure is LoginUserName.Exceptions.InvalidInputException
-            )
-
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[2].userNameText.exception is LoginUserName.Exceptions.InvalidInputException
+                results[3].loginAction.getContentIfNotHandled()?.failure is LoginUserName.Exceptions.InvalidInputException
+            )
+            assertTrue(
+                "Error should be InvalidInputException!",
+                results[3].userNameText.exception is LoginUserName.Exceptions.InvalidInputException
             )
             confirmVerified(loginRepository, settingsRepository)
         }
@@ -146,29 +149,28 @@ class LoginViewModelTest {
             val results = mutableListOf<LoginViewModel.UIState>()
             loginViewModel.passwordText.value = "121212981729817391741"
             loginViewModel.state.onEach { results.add(it) }.launchIn(backgroundScope)
-            loginViewModel.doAction(LoginViewModel.Actions.Login)
-
+            loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             advanceUntilIdle()
 
             verifyAll {
                 loginViewModel.state
                 loginViewModel.passwordText
-                loginViewModel.doAction(LoginViewModel.Actions.Login)
+                loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             }
 
             assertTrue(
                 "Should be Progress",
-                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
-            )
-
-            assertTrue(
-                "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled()?.failure is LoginPassword.Exceptions.InvalidInputException
+                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
 
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[2].passwordText.exception is LoginPassword.Exceptions.InvalidInputException
+                results[3].loginAction.getContentIfNotHandled()?.failure is LoginPassword.Exceptions.InvalidInputException
+            )
+
+            assertTrue(
+                "Error should be InvalidInputException!",
+                results[3].passwordText.exception is LoginPassword.Exceptions.InvalidInputException
             )
             confirmVerified(loginRepository, settingsRepository)
         }
@@ -181,23 +183,22 @@ class LoginViewModelTest {
 
             val results = mutableListOf<LoginViewModel.UIState>()
             loginViewModel.state.onEach { results.add(it) }.launchIn(backgroundScope)
-            loginViewModel.doAction(LoginViewModel.Actions.Login)
-
+            loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             advanceUntilIdle()
+
             verify {
                 loginViewModel.state
-                loginViewModel.doAction(LoginViewModel.Actions.Login)
+                loginViewModel.sendIntent(LoginViewModel.Intents.Login)
                 loginRepository.login(any(), any())
             }
 
             assertTrue(
                 "Should be Progress",
-                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
-
             assertTrue(
                 "Should be Failure",
-                results[2].loginAction.getContentIfNotHandled()?.failure == testException
+                results[3].loginAction.getContentIfNotHandled()?.failure == testException
             )
             confirmVerified(settingsRepository)
         }
@@ -211,24 +212,23 @@ class LoginViewModelTest {
 
             val results = mutableListOf<LoginViewModel.UIState>()
             loginViewModel.state.onEach { results.add(it) }.launchIn(backgroundScope)
-            loginViewModel.doAction(LoginViewModel.Actions.Login)
-
+            loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             advanceUntilIdle()
+
             verify {
                 loginViewModel.state
-                loginViewModel.doAction(LoginViewModel.Actions.Login)
+                loginViewModel.sendIntent(LoginViewModel.Intents.Login)
                 loginRepository.login(any(), any())
                 settingsRepository.store(any(), any())
             }
 
             assertTrue(
                 "Should be Progress",
-                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
-
             assertTrue(
                 "Should be Success",
-                results[2].loginAction.getContentIfNotHandled()?.isSuccessTrue == true
+                results[3].loginAction.getContentIfNotHandled()?.isSuccessTrue == true
             )
         }
 
@@ -241,24 +241,23 @@ class LoginViewModelTest {
 
             val results = mutableListOf<LoginViewModel.UIState>()
             loginViewModel.state.onEach { results.add(it) }.launchIn(backgroundScope)
-            loginViewModel.doAction(LoginViewModel.Actions.Login)
-
+            loginViewModel.sendIntent(LoginViewModel.Intents.Login)
             advanceUntilIdle()
+
             verify {
                 loginViewModel.state
-                loginViewModel.doAction(LoginViewModel.Actions.Login)
+                loginViewModel.sendIntent(LoginViewModel.Intents.Login)
                 loginRepository.login(any(), any())
                 settingsRepository.store(any(), any())
             }
 
             assertTrue(
                 "Should be Progress",
-                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
-
             assertTrue(
                 "Should be Failure",
-                results[2].loginAction.getContentIfNotHandled()?.failure == testException
+                results[3].loginAction.getContentIfNotHandled()?.failure == testException
             )
         }
 }

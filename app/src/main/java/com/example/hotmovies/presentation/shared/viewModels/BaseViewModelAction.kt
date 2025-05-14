@@ -2,21 +2,17 @@ package com.example.hotmovies.presentation.shared.viewModels
 
 import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.shareIn
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 abstract class BaseViewModelAction<I, O>(
-    coroutineScope: CoroutineScope,
     replay: Int = 0,
     onStart: (suspend () -> Unit)? = null
 ) {
@@ -30,7 +26,7 @@ abstract class BaseViewModelAction<I, O>(
             onStart?.invoke()
         }.debounce(100).flatMapLatest { input ->
             action(input)
-        }.shareIn(coroutineScope, SharingStarted.WhileSubscribed(8000), replay)
+        }
 
     fun run(input: I) {
         trigger.tryEmit(input)

@@ -1,9 +1,11 @@
 package com.example.hotmovies.presentation.movies.detail.viewModel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.hotmovies.appplication.movies.MovieDetailsUseCase
+import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.domain.MovieDetails
-import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Actions.LoadMovieDetails
+import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Intents.LoadMovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.actions.MovieDetailsAction
 import com.example.hotmovies.presentation.shared.viewModels.CustomViewModel
 import com.example.hotmovies.shared.Event
@@ -13,13 +15,17 @@ import com.example.hotmovies.shared.progress
 import com.example.hotmovies.shared.progressEvent
 import com.example.hotmovies.shared.stateEvent
 import com.example.hotmovies.shared.stateEventFailure
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.stateIn
 
-class MovieDetailsViewModel(useCase: MovieDetailsUseCase) : CustomViewModel() {
+class MovieDetailsViewModel(savedStateHandle: SavedStateHandle, useCase: MovieDetailsUseCase) :
+    CustomViewModel() {
+
+    private val movie: Movie = savedStateHandle["movie"]!!
 
     data class MovieDetailsUIState(
         val title: String,
@@ -50,36 +56,48 @@ class MovieDetailsViewModel(useCase: MovieDetailsUseCase) : CustomViewModel() {
         }
     }
 
-    private val movieDetailsAction =
-        MovieDetailsAction(viewModelScope, useCase)
+    private val movieDetailsAction = MovieDetailsAction(useCase)
 
-    private var _state = MutableStateFlow(UIState.defaultState())
-    val state = _state.asStateFlow()
-
-    init {
-        movieDetailsAction.state.onEach { result ->
-            checkMainThread()
-            when (result) {
-                is ResultState.Success -> {
-                    _state.update {
-                        it.copy(
-                            MovieDetailsUIState.fromDomain(result.value),
-                            loadAction = true.stateEvent()
-                        )
-                    }
-                }
-
-                is progress -> _state.update { it.copy(loadAction = progressEvent) }
-                is ResultState.Failure -> _state.update { it.copy(loadAction = result.exception.stateEventFailure()) }
+    val state = merge(
+        movieDetailsAction.state.map {
+            { state: UIState ->
+                reduceMovieDetails(
+                    state,
+                    it
+                )
             }
-        }.launchIn(viewModelScope)
+        }
+    ).scan(UIState.defaultState()) { state, reducer ->
+        reducer(state)
+    }.onStart {
+        sendIntent(LoadMovieDetails(movie.id))
+    }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            UIState.defaultState()
+        )
+
+    private fun reduceMovieDetails(state: UIState, result: ResultState<MovieDetails>): UIState {
+        checkMainThread()
+        return when (result) {
+            is ResultState.Success -> {
+                state.copy(
+                    movieDetails = MovieDetailsUIState.fromDomain(result.value),
+                    loadAction = true.stateEvent()
+                )
+            }
+
+            is progress -> state.copy(loadAction = progressEvent)
+            is ResultState.Failure -> state.copy(loadAction = result.exception.stateEventFailure())
+        }
     }
 
-    sealed interface Actions {
-        data class LoadMovieDetails(val movieId: Int) : Actions
+    sealed interface Intents {
+        data class LoadMovieDetails(val movieId: Int) : Intents
     }
 
-    fun doAction(action: Actions) {
+    fun sendIntent(action: Intents) {
         when (action) {
             is LoadMovieDetails -> movieDetailsAction.run(action.movieId)
         }

@@ -10,9 +10,9 @@ import com.example.hotmovies.appplication.login.LogoutUserCase
 import com.example.hotmovies.appplication.movies.interfaces.UserDetailsUseCase
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.domain.User
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadMovies
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.LoadUserDetails
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Actions.Logout
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadMovies
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadUserDetails
+import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.Logout
 import com.example.hotmovies.presentation.movies.list.viewModel.actions.LogoutAction
 import com.example.hotmovies.presentation.movies.list.viewModel.actions.MoviesAction
 import com.example.hotmovies.presentation.movies.list.viewModel.actions.UserDetailsAction
@@ -26,10 +26,14 @@ import com.example.hotmovies.shared.stateEvent
 import com.example.hotmovies.shared.stateEventFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 class MoviesViewModel(
     resources: Resources,
@@ -46,10 +50,7 @@ class MoviesViewModel(
     ) {
         companion object {
             fun defaultState() = UserDetailsUIState(
-                "",
-                "",
-                "",
-                null
+                "", "", "", null
             )
 
             fun fromDomain(resources: Resources, user: User): UserDetailsUIState {
@@ -69,89 +70,83 @@ class MoviesViewModel(
         val logoutAction: Event<ResultState<Boolean>>
     ) {
         companion object {
-            fun defaultState() =
-                UIState(
-                    UserDetailsUIState.defaultState(),
-                    Event(false),
-                    false.stateEvent(),
-                    false.stateEvent()
-                )
+            fun defaultState() = UIState(
+                UserDetailsUIState.defaultState(),
+                Event(false),
+                false.stateEvent(),
+                false.stateEvent()
+            )
         }
     }
 
-    private val logoutAction =
-        LogoutAction(viewModelScope, logoutUseCase)
-    private val moviesAction = MoviesAction(viewModelScope, moviePager, viewModelScope)
-    private val userDetailsAction = UserDetailsAction(viewModelScope, userDetailsUseCase)
+    private val logoutAction = LogoutAction(logoutUseCase)
+    private val moviesAction = MoviesAction(moviePager, viewModelScope)
+    private val userDetailsAction = UserDetailsAction(userDetailsUseCase)
+    private val showingMovieDetail = MutableStateFlow(Event(false))
 
-    private var _state = MutableStateFlow(UIState.defaultState())
-    val state = _state.asStateFlow()
-    val moviesPagingData: Flow<PagingData<Movie>> = moviesAction.state
-
-    init {
-        userDetailsAction.state.onEach { result ->
-            checkMainThread()
-            when (result) {
-                is ResultState.Success -> {
-                    _state.update {
-                        it.copy(
-                            userDetails = UserDetailsUIState.fromDomain(
-                                resources,
-                                result.value
-                            ),
-                            userDetailsAction = true.stateEvent()
-                        )
-                    }
-
-                }
-
-                is progress -> _state.update { it.copy(userDetailsAction = progressEvent) }
-                is ResultState.Failure -> _state.update { it.copy(userDetailsAction = result.exception.stateEventFailure()) }
+    val state: StateFlow<UIState> = merge(
+        showingMovieDetail.map { { state: UIState -> state.copy(movieDetailAction = it) } },
+        logoutAction.state.map { { state: UIState -> reduceLogout(state, it) } },
+        userDetailsAction.state.map {
+            { state: UIState ->
+                reduceUserDetails(
+                    state,
+                    resources,
+                    it
+                )
             }
-        }.launchIn(viewModelScope)
+        })
+        .scan(UIState.defaultState()) { state, reducer ->
+            reducer(state)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
 
-        logoutAction.state.onEach { result ->
-            checkMainThread()
-            when (result) {
-                is ResultState.Success -> {
-                    _state.update {
-                        it.copy(
-                            logoutAction = true.stateEvent()
-                        )
-                    }
-                }
+    val moviesPagingData: Flow<PagingData<Movie>> =
+        moviesAction.state.onStart {
+            sendIntent(LoadUserDetails)
+        }
+            .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
 
-                is progress -> _state.update {
-                    it.copy(
-                        userDetailsAction = progressEvent,
-                        logoutAction = progressEvent
-                    )
-                }
+    private fun reduceLogout(state: UIState, result: ResultState<Unit>): UIState {
+        checkMainThread()
+        return when (result) {
+            is ResultState.Success -> state.copy(
+                logoutAction = true.stateEvent()
+            )
 
-                is ResultState.Failure -> _state.update { it.copy(logoutAction = result.exception.stateEventFailure()) }
-            }
-        }.launchIn(viewModelScope)
+            is progress -> state.copy(
+                userDetailsAction = progressEvent, logoutAction = progressEvent
+            )
+
+            is ResultState.Failure -> state.copy(logoutAction = result.exception.stateEventFailure())
+        }
     }
 
-    sealed interface Actions {
-        data class ShowingMovieDetail(val isActive: Boolean) : Actions
-        data object LoadUserDetails : Actions
-        data object LoadMovies : Actions
-        data object Logout : Actions
+    private fun reduceUserDetails(
+        state: UIState, resources: Resources, result: ResultState<User>
+    ): UIState {
+        checkMainThread()
+        return when (result) {
+            is ResultState.Success -> state.copy(
+                userDetails = UserDetailsUIState.fromDomain(
+                    resources, result.value
+                ), userDetailsAction = true.stateEvent()
+            )
+
+            is progress -> state.copy(userDetailsAction = progressEvent)
+            is ResultState.Failure -> state.copy(userDetailsAction = result.exception.stateEventFailure())
+        }
     }
 
-    fun doAction(action: Actions) {
+    sealed interface Intents {
+        data class ShowingMovieDetail(val isActive: Boolean) : Intents
+        data object LoadUserDetails : Intents
+        data object LoadMovies : Intents
+        data object Logout : Intents
+    }
+
+    fun sendIntent(action: Intents) {
         when (action) {
-            is Actions.ShowingMovieDetail -> {
-                _state.update {
-                    it.copy(
-                        movieDetailAction = Event(
-                            action.isActive
-                        )
-                    )
-                }
-            }
-
+            is Intents.ShowingMovieDetail -> showingMovieDetail.value = Event(action.isActive)
             is LoadMovies -> moviesAction.run(Unit)
             is LoadUserDetails -> userDetailsAction.run(Unit)
             is Logout -> logoutAction.run(Unit)

@@ -159,7 +159,7 @@
                 android:id="@+id/login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:enabled="@{layoutViewModel.state.loginButton.isEnabled &amp;&amp; layoutViewModel.state.isScreenEnabled}"
+                android:enabled="@{layoutViewModel.state.loginButton.isEnabled}"
                 android:imeOptions="actionGo"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
