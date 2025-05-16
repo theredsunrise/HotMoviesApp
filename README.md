@@ -20,6 +20,7 @@ Additionally, it includes:
 
 - **Flow**
 - **Retrofit**
+- **Dagger**
 - **Glide with the custom GlideModule**
 - **Lottie**
 - **Downloadable fonts**
