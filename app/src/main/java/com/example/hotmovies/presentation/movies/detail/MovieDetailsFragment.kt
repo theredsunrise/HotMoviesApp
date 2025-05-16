@@ -48,7 +48,7 @@ class MovieDetailsFragment : Fragment() {
 
     private val args: MovieDetailsFragmentArgs by navArgs()
     private val movieDetailsViewModel: MovieDetailsViewModel by viewModels {
-        MovieDetailsViewModelFactory(this, args.toBundle(), diContainer())
+        MovieDetailsViewModelFactory(diContainer())
     }
     private val movieDetailsDialogFactory = DialogFragmentHandler("movieDetails")
 

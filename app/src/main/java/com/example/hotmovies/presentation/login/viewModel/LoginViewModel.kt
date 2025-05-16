@@ -1,6 +1,5 @@
 package com.example.hotmovies.presentation.login.viewModel.actions
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hotmovies.appplication.login.LoginUserUseCase

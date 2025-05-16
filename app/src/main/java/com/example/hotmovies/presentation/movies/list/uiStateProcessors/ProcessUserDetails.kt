@@ -1,6 +1,5 @@
 package com.example.hotmovies.presentation.movies.list.uiStateProcessors
 
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
@@ -51,6 +50,7 @@ class ProcessUserDetails(
             loadAction.isSuccessTrue -> {
                 moviesViewModel.sendIntent(LoadMovies)
             }
+
             loadAction is ResultState.Failure -> userDetailsDialogHandler.showErrorDialog(
                 fragment.findNavController(),
                 loadAction.exception

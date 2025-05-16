@@ -1,6 +1,5 @@
 package com.example.hotmovies.presentation.movies.list.viewModel.actions
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
