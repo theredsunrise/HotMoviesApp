@@ -25,7 +25,6 @@ import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.Intents.LoadMovieDetails
 import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModel.UIState
-import com.example.hotmovies.presentation.movies.detail.viewModel.MovieDetailsViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.presentation.shared.helpers.DrawableFactory
@@ -36,8 +35,8 @@ import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
 import com.example.hotmovies.shared.Constants
 import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.application
 import com.example.hotmovies.shared.checkMainThread
-import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.doOnLayoutAsync
 import com.example.hotmovies.shared.userInteractionComponent
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +47,7 @@ class MovieDetailsFragment : Fragment() {
 
     private val args: MovieDetailsFragmentArgs by navArgs()
     private val movieDetailsViewModel: MovieDetailsViewModel by viewModels {
-        MovieDetailsViewModelFactory(diContainer())
+        application.appComponent.movieDetailsViewModelFactory()
     }
     private val movieDetailsDialogFactory = DialogFragmentHandler("movieDetails")
 

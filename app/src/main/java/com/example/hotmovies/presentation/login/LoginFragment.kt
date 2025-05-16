@@ -18,15 +18,14 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.example.hotmovies.R
 import com.example.hotmovies.databinding.FragmentLoginBinding
-import com.example.hotmovies.presentation.login.viewModel.LoginViewModelFactory
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Intents.Animation
 import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.Intents.Login
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
 import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.application
 import com.example.hotmovies.shared.checkMainThread
-import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.doOnLayoutAsync
 import com.example.hotmovies.shared.hideSoftKeyboardAsync
 import com.example.hotmovies.shared.safeNavigation
@@ -37,9 +36,7 @@ import kotlinx.coroutines.launch
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private val loginViewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(
-            diContainer()
-        )
+        application.appComponent.loginViewModelFactory()
     }
 
     override fun onCreateView(

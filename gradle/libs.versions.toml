@@ -1,26 +1,27 @@
 [versions]
-agp = "8.9.1"
+agp = "8.9.2"
 kotlin = "2.1.20"
-coreKtx = "1.16.0-alpha01"
+coreKtx = "1.16.0"
 appcompat = "1.7.0"
 material = "1.12.0"
 paging = "3.3.6"
 constraintlayout = "2.2.1"
-navigation = "2.8.9"
+navigation = "2.9.0-alpha09"
 lottieVersion = "6.6.2"
-dataStore = "1.1.4"
+dataStore = "1.1.6"
 annotation = "1.9.1"
-lifecycleLivedataKtx = "2.8.7"
-lifecycleViewmodelKtx = "2.8.7"
+lifecycleLivedataKtx = "2.9.0"
+lifecycleViewmodelKtx = "2.9.0"
 retrofit = "2.11.0"
 interceptor = "4.12.0"
 glide = "4.16.0"
 legacySupportV4 = "1.0.0"
 fragmentKtx = "1.8.6"
+dagger = "HEAD-SNAPSHOT"
 
 mockk = "1.14.0"
 coroutineTests="1.10.1"
-junit = "4.12"
+junit = "4.13.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,12 +44,14 @@ glide-processor = { group = "com.github.bumptech.glide", name = "compiler", vers
 androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+
 mockk = {module = "io.mockk:mockk", version.ref="mockk"}
 coroutine-tests = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref="coroutineTests"}
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 safeArgs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }

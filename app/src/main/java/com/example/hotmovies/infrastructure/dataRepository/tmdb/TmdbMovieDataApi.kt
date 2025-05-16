@@ -26,7 +26,7 @@ interface TmdbMovieDataApiInterface {
     suspend fun getTrendingMoviesInfo(@Query("page") pageId: Int): retrofit2.Response<MoviesInfoDto>
 }
 
-private class AuthorizationInterceptor : Interceptor {
+class AuthorizationInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val newUrl = request.url.newBuilder()

@@ -172,7 +172,7 @@ fun checkNotMainThread() {
     }
 }
 
-fun Fragment.diContainer() = (requireActivity().application as CustomApplication).diContainer
+val Fragment.application get() = (requireActivity().application as CustomApplication)
 
 //xor string with a char key
 @OptIn(ExperimentalEncodingApi::class)

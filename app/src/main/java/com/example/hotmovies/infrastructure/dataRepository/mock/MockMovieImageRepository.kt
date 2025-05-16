@@ -17,14 +17,15 @@ import java.security.InvalidParameterException
 
 class MockMovieImageRepository(
     private val appContext: Context,
-    @DrawableRes private val avatarId: Int
+    @DrawableRes private val avatarId: Int,
+    private val checkNetworkStatus: Boolean
 ) :
     MovieImageRepositoryInterface {
 
     override fun getImage(id: String): InputStream {
         checkNotMainThread()
         Thread.sleep(1000)
-        if (!NetworkStatusResolver.isNetworkAvailable(appContext)) throw NoNetworkConnectionException()
+        if (checkNetworkStatus && !NetworkStatusResolver.isNetworkAvailable(appContext)) throw NoNetworkConnectionException()
         if (id.isEmpty()) throw InvalidParameterException()
 
         val bmp = BitmapFactory.decodeResource(appContext.resources, avatarId)
@@ -40,7 +41,7 @@ class MockMovieImageRepository(
 
     override fun getImageAsync(id: String): Flow<Bitmap> = flow {
         checkNotMainThread()
-        if (!NetworkStatusResolver.isNetworkAvailable(appContext)) throw NoNetworkConnectionException()
+        if (checkNetworkStatus && !NetworkStatusResolver.isNetworkAvailable(appContext)) throw NoNetworkConnectionException()
         emit(BitmapFactory.decodeResource(appContext.resources, avatarId))
     }
 }

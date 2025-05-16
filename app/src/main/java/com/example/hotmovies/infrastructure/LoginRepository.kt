@@ -11,9 +11,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.security.MessageDigest
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.random.Random
 
-class LoginRepository(private val appContext: Context) : LoginRepositoryInterface {
+@Singleton
+class LoginRepository @Inject constructor(private val appContext: Context) :
+    LoginRepositoryInterface {
     private val messageDigest = MessageDigest.getInstance("MD5")
 
     @OptIn(ExperimentalStdlibApi::class)

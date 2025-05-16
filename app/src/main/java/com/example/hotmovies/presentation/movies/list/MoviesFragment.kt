@@ -30,14 +30,13 @@ import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessU
 import com.example.hotmovies.presentation.movies.list.uiStateProcessors.ProcessUserLogout
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.ShowingMovieDetail
-import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModelFactory
 import com.example.hotmovies.presentation.shared.helpers.ToolbarConfigurator
 import com.example.hotmovies.presentation.shared.imageLoaders.GlideImageLoader
 import com.example.hotmovies.presentation.shared.layouts.CustomStaggeredGridLayoutManager
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
 import com.example.hotmovies.presentation.shared.transitions.UserInteractionTransitionWrapper
 import com.example.hotmovies.shared.Constants
-import com.example.hotmovies.shared.diContainer
+import com.example.hotmovies.shared.application
 import com.example.hotmovies.shared.doOnLayoutAsync
 import com.example.hotmovies.shared.px
 import com.example.hotmovies.shared.safeNavigation
@@ -54,7 +53,7 @@ class MoviesFragment : Fragment() {
 
     private val args: MoviesFragmentArgs by navArgs()
     private val moviesViewModel: MoviesViewModel by viewModels {
-        MoviesViewModelFactory(diContainer())
+        application.appComponent.moviesViewModelFactory()
     }
 
     private lateinit var binding: FragmentMoviesBinding

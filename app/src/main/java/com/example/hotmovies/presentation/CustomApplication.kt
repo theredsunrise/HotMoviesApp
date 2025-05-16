@@ -11,7 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.hotmovies.appplication.DIContainer
+import com.example.hotmovies.di.AppComponent
+import com.example.hotmovies.di.DaggerAppComponent
 import com.example.hotmovies.presentation.KeyboardStateAwareComponent.KeyboardState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +44,10 @@ interface KeyboardStateAwareComponent {
 }
 
 class CustomApplication : Application(), ActivityLifecycleCallbacks, KeyboardStateAwareComponent {
-    val diContainer = DIContainer(this)
+    val appComponent: AppComponent by lazy {
+        DaggerAppComponent.factory().create(applicationContext)
+    }
+
     private var _keyboardState = MutableStateFlow(KeyboardState())
     override val keyboardState: StateFlow<KeyboardState> = _keyboardState
 

@@ -79,7 +79,7 @@ class CustomGlideModule : AppGlideModule() {
                 .skipMemoryCache(false)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
         )
-        imageRepository = context.diContainer.movieImageRepository
+        imageRepository = context.appComponent.movieImageRepository()
     }
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {

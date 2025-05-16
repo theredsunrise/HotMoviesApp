@@ -15,15 +15,14 @@ import com.example.hotmovies.R
 import com.example.hotmovies.databinding.FragmentInitializationBinding
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel
 import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModel.Intents.CheckSessionValidity
-import com.example.hotmovies.presentation.initialization.viewModel.InitializationViewModelFactory
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Accept
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.Cancel
 import com.example.hotmovies.presentation.shared.fragments.DialogFragment.Actions.None
 import com.example.hotmovies.presentation.shared.helpers.DialogFragmentHandler
 import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
+import com.example.hotmovies.shared.application
 import com.example.hotmovies.shared.checkMainThread
-import com.example.hotmovies.shared.diContainer
 import com.example.hotmovies.shared.safeNavigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,9 +31,7 @@ class InitializationFragment : Fragment() {
     private lateinit var binding: FragmentInitializationBinding
     private val errorDialogFactory = DialogFragmentHandler("sessionValidity")
     private val initializationViewModel: InitializationViewModel by viewModels {
-        InitializationViewModelFactory(
-            diContainer()
-        )
+        application.appComponent.initializationViewModelFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

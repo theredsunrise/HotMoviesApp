@@ -29,11 +29,11 @@ class ProcessUserLogout(
             R.string.dialog_msg_are_you_sure_to_logout
         )
     )
-    private val logoutDialogHandler = DialogFragmentHandler("logout")
+    private val exceptionDialogHandler = DialogFragmentHandler("logout")
 
     init {
         fragment.lifecycle.apply {
-            addObserver(logoutDialogHandler)
+            addObserver(exceptionDialogHandler)
             addObserver(exitDialogHandler)
         }
     }
@@ -45,7 +45,7 @@ class ProcessUserLogout(
             }
         }
         coroutineScope.launch(Dispatchers.Main.immediate) {
-            logoutDialogHandler.state.collect exit@{ action ->
+            exceptionDialogHandler.state.collect exit@{ action ->
                 checkMainThread()
                 if (action is Accept) else {
                     return@exit
@@ -74,7 +74,7 @@ class ProcessUserLogout(
                 }
             }
 
-            logoutAction is ResultState.Failure -> logoutDialogHandler.showErrorDialog(
+            logoutAction is ResultState.Failure -> exceptionDialogHandler.showErrorDialog(
                 fragment.findNavController(),
                 logoutAction.exception
             )

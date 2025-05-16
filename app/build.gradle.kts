@@ -9,7 +9,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.kapt)
+    kotlin("kapt")
     alias(libs.plugins.safeArgs)
     id("kotlin-parcelize")
 }
@@ -133,7 +133,9 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.dagger)
     kapt(libs.glide.processor)
+    kapt(libs.dagger.compiler)
 
     testImplementation(libs.mockk)
     testImplementation(libs.coroutine.tests)

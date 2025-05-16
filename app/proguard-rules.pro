@@ -20,6 +20,17 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# --- Preferences Data Store ---
+
+-keepclassmembers class androidx.datastore.preferences.PreferencesProto$PreferenceMap {
+    private androidx.datastore.preferences.protobuf.MapFieldLite preferences_;
+}
+
+-keepclassmembers class androidx.datastore.preferences.PreferencesProto$Value {
+     private java.lang.Object value_;
+     private int valueCase_;
+}
+
 # --- Retrofit & Gson Rules ---
 
 # Keep Retrofit interfaces to avoid stripping API definitions
