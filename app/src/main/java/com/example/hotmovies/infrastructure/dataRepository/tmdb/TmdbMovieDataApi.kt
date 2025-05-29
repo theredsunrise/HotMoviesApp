@@ -6,11 +6,7 @@ import com.example.hotmovies.infrastructure.dataRepository.tmdb.dtos.MoviesInfoD
 import com.example.hotmovies.infrastructure.dataRepository.tmdb.dtos.UserDto
 import com.example.hotmovies.shared.toUse
 import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -36,27 +32,5 @@ class AuthorizationInterceptor : Interceptor {
             "Bearer ${BuildConfig.TMDB_BEARER.toUse(45)}"
         ).build()
         return chain.proceed(newRequest)
-    }
-}
-
-object TmdbMovieDataApiServiceFactory {
-    private const val BASE_URL =
-        "https://api.themoviedb.org/"
-    private val instance: Retrofit
-
-    init {
-        val interceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .addInterceptor(AuthorizationInterceptor())
-            .cache(null)
-            .build()
-        instance = Retrofit.Builder().baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client).build()
-    }
-
-    fun create(): TmdbMovieDataApiInterface {
-        return instance.create(TmdbMovieDataApiInterface::class.java)
     }
 }

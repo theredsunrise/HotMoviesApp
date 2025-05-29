@@ -139,7 +139,7 @@ class GlideImageLoader private constructor() : ImageLoaderInterface {
 
                 imageView.runAnimator {
                     ViewAnimationUtils.createCircularReveal(
-                        imageView,
+                        this@runAnimator,
                         0,
                         0,
                         0f,

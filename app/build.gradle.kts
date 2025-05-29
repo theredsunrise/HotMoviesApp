@@ -9,7 +9,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    kotlin("kapt")
+    alias(libs.plugins.kotlinKapt)
     alias(libs.plugins.safeArgs)
     id("kotlin-parcelize")
 }
