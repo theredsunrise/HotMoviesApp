@@ -71,15 +71,15 @@ class InitializationFragment : Fragment() {
 
     private fun processSessionValidityAction(sessionValidityAction: Event<ResultState<Boolean>>) {
         checkMainThread()
-        val sessionValidityAction = sessionValidityAction.getContentIfNotHandled() ?: return
+        val consumableAction = sessionValidityAction.getContentIfNotHandled() ?: return
 
-        binding.indicator.isVisible = sessionValidityAction.isProgress
-        when (sessionValidityAction) {
-            is ResultState.Success -> navigate(sessionValidityAction.value)
+        binding.indicator.isVisible = consumableAction.isProgress
+        when (consumableAction) {
+            is ResultState.Success -> navigate(consumableAction.value)
             is ResultState.Failure -> {
                 errorDialogFactory.showErrorDialog(
                     findNavController(),
-                    sessionValidityAction.exception
+                    consumableAction.exception
                 )
             }
 

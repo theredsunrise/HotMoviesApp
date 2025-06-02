@@ -15,6 +15,7 @@ class ImageViewWithAnimator
 
     fun cancelAnimator() {
         animator?.cancel()
+        animator?.setTarget(null)
         animator = null
     }
 

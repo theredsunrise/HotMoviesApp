@@ -3,35 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:interpolator="@android:interpolator/fast_out_slow_in"
     android:transitionOrdering="together">
-    <changeBounds android:interpolator="@android:interpolator/fast_out_extra_slow_in">
+    <changeBounds
+        android:interpolator="@android:interpolator/fast_out_extra_slow_in"
+        android:reparent="true"
+        android:reparentWithOverlay="false">
         <pathMotion
             class="com.example.hotmovies.presentation.shared.transitions.TransitionMaterialArcMotion"
             tools:ignore="Instantiatable" />
         <targets>
+            <target android:targetId="@id/avatar" />
             <target android:targetId="@id/info" />
             <target android:targetId="@id/login" />
         </targets>
     </changeBounds>
-    <changeTransform>
+    <changeTransform
+        android:reparent="true"
+        android:reparentWithOverlay="false">
         <targets>
+            <target android:targetId="@id/avatar" />
             <target android:targetId="@id/info" />
             <target android:targetId="@id/login" />
         </targets>
     </changeTransform>
-    <changeClipBounds>
+    <changeClipBounds
+        android:reparent="true"
+        android:reparentWithOverlay="false">
         <targets>
+            <target android:targetId="@id/avatar" />
             <target android:targetId="@id/info" />
             <target android:targetId="@id/login" />
         </targets>
     </changeClipBounds>
-    <changeImageTransform>
+    <changeImageTransform
+        android:reparent="true"
+        android:reparentWithOverlay="false">
         <targets>
+            <target android:targetId="@id/avatar" />
             <target android:targetId="@id/info" />
             <target android:targetId="@id/login" />
         </targets>
     </changeImageTransform>
-    <changeScroll>
+    <changeScroll
+        android:reparent="true"
+        android:reparentWithOverlay="false">
         <targets>
+            <target android:targetId="@id/avatar" />
             <target android:targetId="@id/info" />
             <target android:targetId="@id/login" />
         </targets>

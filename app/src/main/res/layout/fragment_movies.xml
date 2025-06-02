@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:elevation="2dp"
             android:indeterminate="true"
-            android:visibility="@{layoutViewModel.state.userDetailsAction.content.isProgress || layoutViewModel.state.userDetailsAction.content.isFailure ? View.VISIBLE : View.GONE}"
+            android:visibility="@{layoutViewModel.state.userDetailsAction.content.success == null ? View.VISIBLE : View.GONE}"
             app:indicatorColor="@color/colorPrimaryInverted"
             app:layout_constraintBottom_toBottomOf="@+id/avatar"
             app:layout_constraintEnd_toEndOf="@+id/avatar"
@@ -64,7 +64,7 @@
             android:outlineAmbientShadowColor="@android:color/transparent"
             android:outlineSpotShadowColor="@android:color/transparent"
             android:scaleType="centerCrop"
-            android:src="@{layoutViewModel.state.userDetailsAction.content.progress ? null : layoutViewModel.state.userDetails.avatar}"
+            android:src="@{layoutViewModel.state.userDetailsAction.content.success == null ? null : layoutViewModel.state.userDetails.avatar}"
             app:layout_constraintStart_toStartOf="@id/info"
             app:layout_constraintTop_toTopOf="@+id/info"
             app:shapeAppearanceOverlay="@style/RoundedSquare.Avatar" />

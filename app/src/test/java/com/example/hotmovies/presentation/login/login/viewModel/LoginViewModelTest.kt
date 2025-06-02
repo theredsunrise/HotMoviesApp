@@ -79,7 +79,7 @@ class LoginViewModelTest {
             loginViewModel.state
             loginViewModel.userNameText
         }
-        assertFalse("Login button should not be enabled!", results[2].loginButton.isEnabled)
+        assertFalse("Login button should not be enabled!", results[1].loginButton.isEnabled)
         confirmVerified(loginRepository, settingsRepository)
     }
 
@@ -126,15 +126,15 @@ class LoginViewModelTest {
 
             assertTrue(
                 "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[3].loginAction.getContentIfNotHandled()?.failure is LoginUserName.Exceptions.InvalidInputException
+                results[2].loginAction.getContentIfNotHandled()?.failure is LoginUserName.Exceptions.InvalidInputException
             )
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[3].userNameText.exception is LoginUserName.Exceptions.InvalidInputException
+                results[2].userNameText.exception is LoginUserName.Exceptions.InvalidInputException
             )
             confirmVerified(loginRepository, settingsRepository)
         }
@@ -159,17 +159,17 @@ class LoginViewModelTest {
 
             assertTrue(
                 "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
 
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[3].loginAction.getContentIfNotHandled()?.failure is LoginPassword.Exceptions.InvalidInputException
+                results[2].loginAction.getContentIfNotHandled()?.failure is LoginPassword.Exceptions.InvalidInputException
             )
 
             assertTrue(
                 "Error should be InvalidInputException!",
-                results[3].passwordText.exception is LoginPassword.Exceptions.InvalidInputException
+                results[2].passwordText.exception is LoginPassword.Exceptions.InvalidInputException
             )
             confirmVerified(loginRepository, settingsRepository)
         }
@@ -193,11 +193,11 @@ class LoginViewModelTest {
 
             assertTrue(
                 "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
             assertTrue(
                 "Should be Failure",
-                results[3].loginAction.getContentIfNotHandled()?.failure == testException
+                results[2].loginAction.getContentIfNotHandled()?.failure == testException
             )
             confirmVerified(settingsRepository)
         }
@@ -223,11 +223,11 @@ class LoginViewModelTest {
 
             assertTrue(
                 "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
             assertTrue(
                 "Should be Success",
-                results[3].loginAction.getContentIfNotHandled()?.isSuccessTrue == true
+                results[2].loginAction.getContentIfNotHandled()?.isSuccessTrue == true
             )
         }
 
@@ -252,11 +252,11 @@ class LoginViewModelTest {
 
             assertTrue(
                 "Should be Progress",
-                results[2].loginAction.getContentIfNotHandled() == ResultState.Progress
+                results[1].loginAction.getContentIfNotHandled() == ResultState.Progress
             )
             assertTrue(
                 "Should be Failure",
-                results[3].loginAction.getContentIfNotHandled()?.failure == testException
+                results[2].loginAction.getContentIfNotHandled()?.failure == testException
             )
         }
 }

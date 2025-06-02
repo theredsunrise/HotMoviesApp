@@ -7,7 +7,7 @@ import com.example.hotmovies.shared.ResultState
 import kotlinx.coroutines.flow.Flow
 
 class UserDetailsAction(private val useCase: UserDetailsUseCase) :
-    BaseResultStateViewModelAction<Unit, User>(replay = 1) {
+    BaseResultStateViewModelAction<Unit, User>() {
 
     override fun action(value: Unit): Flow<ResultState<User>> {
         return useCase()

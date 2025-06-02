@@ -15,12 +15,15 @@ import com.example.hotmovies.shared.progress
 import com.example.hotmovies.shared.progressEvent
 import com.example.hotmovies.shared.stateEvent
 import com.example.hotmovies.shared.stateEventFailure
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(savedStateHandle: SavedStateHandle, useCase: MovieDetailsUseCase) :
     CustomViewModel() {
@@ -58,25 +61,33 @@ class MovieDetailsViewModel(savedStateHandle: SavedStateHandle, useCase: MovieDe
 
     private val movieDetailsAction = MovieDetailsAction(useCase)
 
-    val state = merge(
-        movieDetailsAction.state.map {
-            { state: UIState ->
-                reduceMovieDetails(
-                    state,
-                    it
-                )
-            }
+    private var job: Job? = null
+    private var state_ = MutableSharedFlow<UIState>()
+    val state = state_
+        .onStart {
+            startActions()
+            sendIntent(LoadMovieDetails(movie.id))
         }
-    ).scan(UIState.defaultState()) { state, reducer ->
-        reducer(state)
-    }.onStart {
-        sendIntent(LoadMovieDetails(movie.id))
+        .onCompletion {
+            stopActions()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
+
+    private fun startActions() {
+        stopActions()
+        println("***** Connected")
+        job = viewModelScope.launch {
+            movieDetailsAction.state.onEach {
+                state_.emit(reduceMovieDetails(state.value, it))
+            }.launchIn(this)
+        }
     }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            UIState.defaultState()
-        )
+
+    private fun stopActions() {
+        job?.cancel()
+        job = null
+        println("***** Disconnected")
+    }
 
     private fun reduceMovieDetails(state: UIState, result: ResultState<MovieDetails>): UIState {
         checkMainThread()

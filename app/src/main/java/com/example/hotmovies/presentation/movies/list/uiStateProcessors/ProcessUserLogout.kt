@@ -63,9 +63,9 @@ class ProcessUserLogout(
     private fun processLogoutAction(logoutAction: Event<ResultState<Boolean>>) {
         checkMainThread()
         fragment.userInteractionComponent.isEnabled = !logoutAction.content.isProgress
-        val logoutAction = logoutAction.getContentIfNotHandled() ?: return
+        val consumableAction = logoutAction.getContentIfNotHandled() ?: return
         when {
-            logoutAction.isSuccessTrue -> {
+            consumableAction.isSuccessTrue -> {
                 fragment.exitTransition = null
                 fragment.findNavController().safeNavigation(R.id.moviesFragment) {
                     val navDirection =
@@ -74,9 +74,9 @@ class ProcessUserLogout(
                 }
             }
 
-            logoutAction is ResultState.Failure -> exceptionDialogHandler.showErrorDialog(
+            consumableAction is ResultState.Failure -> exceptionDialogHandler.showErrorDialog(
                 fragment.findNavController(),
-                logoutAction.exception
+                consumableAction.exception
             )
         }
     }

@@ -33,7 +33,6 @@ import com.example.hotmovies.presentation.shared.imageLoaders.GlideImageLoader
 import com.example.hotmovies.presentation.shared.imageLoaders.ImageThumbnailLoaderContextInterface
 import com.example.hotmovies.presentation.shared.transitions.TransitionFactory
 import com.example.hotmovies.shared.Constants
-import com.example.hotmovies.shared.Event
 import com.example.hotmovies.shared.ResultState
 import com.example.hotmovies.shared.application
 import com.example.hotmovies.shared.checkMainThread
@@ -95,8 +94,7 @@ class MovieDetailsFragment : Fragment() {
                 }
                 launch(Dispatchers.Main.immediate) {
                     movieDetailsViewModel.state.collect { state ->
-                        processLoadingMovieDetailsAction(state.loadAction)
-                        processDataOfMovieDetailsAction(state)
+                        processLoadingMovieDetailsAction(state)
                     }
                 }
                 launch(Dispatchers.Main.immediate) {
@@ -148,22 +146,21 @@ class MovieDetailsFragment : Fragment() {
         postponeEnterTransition()
     }
 
-    private fun processDataOfMovieDetailsAction(state: UIState) {
+    private fun processLoadingMovieDetailsAction(state: UIState) {
         checkMainThread()
-        if (state.loadAction.content.isSuccessTrue) {
+
+        val actionContent = state.loadAction.content
+        if (actionContent.isSuccessTrue) {
             loadPosterImage(state.movieDetails.posterUrl.orEmpty())
         } else {
             glideImageLoader.clear(binding.posterImage)
         }
-    }
 
-    private fun processLoadingMovieDetailsAction(loadAction: Event<ResultState<Boolean>>) {
-        checkMainThread()
-        val loadAction = loadAction.getContentIfNotHandled() ?: return
+        val consumableAction = state.loadAction.getContentIfNotHandled() ?: return
         when {
-            loadAction is ResultState.Failure -> movieDetailsDialogFactory.showErrorDialog(
+            consumableAction is ResultState.Failure -> movieDetailsDialogFactory.showErrorDialog(
                 findNavController(),
-                loadAction.exception
+                consumableAction.exception
             )
         }
     }

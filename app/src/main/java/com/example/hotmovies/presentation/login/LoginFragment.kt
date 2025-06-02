@@ -104,10 +104,10 @@ class LoginFragment : Fragment() {
         animator: LoginAnimator
     ) {
         checkMainThread()
-        val loginAction = loginAction.getContentIfNotHandled() ?: return
+        val consumableAction = loginAction.getContentIfNotHandled() ?: return
         when {
-            loginAction.isSuccessTrue -> navigate()
-            loginAction.isFailure -> {
+            consumableAction.isSuccessTrue -> navigate()
+            consumableAction.isFailure -> {
                 animator.transitionToStartAsync(immediately = true)
             }
         }

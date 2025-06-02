@@ -12,12 +12,16 @@ import com.example.hotmovies.shared.checkMainThread
 import com.example.hotmovies.shared.progressEvent
 import com.example.hotmovies.shared.stateEvent
 import com.example.hotmovies.shared.stateEventFailure
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class LoginViewModel(useCase: LoginUserUseCase) : ViewModel() {
 
@@ -54,17 +58,44 @@ class LoginViewModel(useCase: LoginUserUseCase) : ViewModel() {
     val userNameText = MutableStateFlow("test123")
     val passwordText = MutableStateFlow("1234567890")
 
-    private val animationAction = MutableStateFlow<Boolean>(false)
+    private val animationAction = MutableStateFlow(false)
     private val loginAction = LoginAction(useCase)
 
-    val state = merge(
-        loginAction.state.map { { state: UIState -> reduceLogin(state, it) } },
-        userNameText.map { { state: UIState -> reduceUsernameText(state, it) } },
-        passwordText.map { { state: UIState -> reducePasswordText(state, it) } },
-        animationAction.map { { state: UIState -> reduceAnimation(state, it) } }
-    ).scan(UIState.defaultState()) { state, reducer ->
-        reducer(state)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
+    private var job: Job? = null
+    private var state_ = MutableSharedFlow<UIState>()
+    val state = state_
+        .onStart {
+            startActions()
+        }
+        .onCompletion {
+            stopActions()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
+
+    private fun startActions() {
+        stopActions()
+        println("***** Connected")
+        job = viewModelScope.launch {
+            loginAction.state.onEach {
+                state_.emit(reduceLogin(state.value, it))
+            }.launchIn(this)
+            userNameText.onEach {
+                state_.emit(reduceUsernameText(state.value, it))
+            }.launchIn(this)
+            passwordText.onEach {
+                state_.emit(reducePasswordText(state.value, it))
+            }.launchIn(this)
+            animationAction.onEach {
+                state_.emit(reduceAnimation(state.value, it))
+            }.launchIn(this)
+        }
+    }
+
+    private fun stopActions() {
+        job?.cancel()
+        job = null
+        println("***** Disconnected")
+    }
 
     fun sendIntent(intent: Intents) {
         when (intent) {

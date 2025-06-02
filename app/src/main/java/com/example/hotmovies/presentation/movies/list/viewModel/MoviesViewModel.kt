@@ -10,6 +10,7 @@ import com.example.hotmovies.appplication.login.LogoutUserCase
 import com.example.hotmovies.appplication.movies.interfaces.UserDetailsUseCase
 import com.example.hotmovies.domain.Movie
 import com.example.hotmovies.domain.User
+import com.example.hotmovies.presentation.login.viewModel.actions.LoginViewModel.UIState
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadMovies
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.LoadUserDetails
 import com.example.hotmovies.presentation.movies.list.viewModel.MoviesViewModel.Intents.Logout
@@ -24,19 +25,23 @@ import com.example.hotmovies.shared.progress
 import com.example.hotmovies.shared.progressEvent
 import com.example.hotmovies.shared.stateEvent
 import com.example.hotmovies.shared.stateEventFailure
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.minutes
 
 class MoviesViewModel(
-    resources: Resources,
+    private val resources: Resources,
     moviePager: Pager<Int, Movie>,
     userDetailsUseCase: UserDetailsUseCase,
     logoutUseCase: LogoutUserCase,
@@ -84,27 +89,42 @@ class MoviesViewModel(
     private val userDetailsAction = UserDetailsAction(userDetailsUseCase)
     private val showingMovieDetail = MutableStateFlow(Event(false))
 
-    val state: StateFlow<UIState> = merge(
-        showingMovieDetail.map { { state: UIState -> state.copy(movieDetailAction = it) } },
-        logoutAction.state.map { { state: UIState -> reduceLogout(state, it) } },
-        userDetailsAction.state.map {
-            { state: UIState ->
-                reduceUserDetails(
-                    state,
-                    resources,
-                    it
-                )
-            }
-        })
-        .scan(UIState.defaultState()) { state, reducer ->
-            reducer(state)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
-
-    val moviesPagingData: Flow<PagingData<Movie>> =
-        moviesAction.state.onStart {
-            sendIntent(LoadUserDetails)
+    private var job: Job? = null
+    private var state_ = MutableSharedFlow<UIState>()
+    val state = state_
+        .onStart {
+            startActions()
         }
-            .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+        .onCompletion {
+            stopActions()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UIState.defaultState())
+
+    private fun startActions() {
+        stopActions()
+        println("***** Connected")
+        job = viewModelScope.launch {
+            showingMovieDetail.onEach {
+                state_.emit(state.value.copy(movieDetailAction = it))
+            }.launchIn(this)
+            logoutAction.state.onEach {
+                state_.emit(reduceLogout(state.value, it))
+            }.launchIn(this)
+            userDetailsAction.state.onEach {
+                state_.emit(reduceUserDetails(state.value, resources, it))
+            }.launchIn(this)
+        }
+    }
+
+    private fun stopActions() {
+        job?.cancel()
+        job = null
+        println("***** Disconnected")
+    }
+
+    val moviesPagingData: Flow<PagingData<Movie>> = moviesAction.state.onStart {
+        sendIntent(LoadUserDetails)
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(60.minutes), 1)
 
     private fun reduceLogout(state: UIState, result: ResultState<Unit>): UIState {
         checkMainThread()

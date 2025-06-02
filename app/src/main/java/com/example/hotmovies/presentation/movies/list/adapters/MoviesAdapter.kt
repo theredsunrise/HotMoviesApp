@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
@@ -68,6 +67,8 @@ class MoviesAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movie = getItem(position) ?: return
         holder.binding.apply {
+            executePendingBindings()
+
             val movieId = movie.id.toString()
             itemRoot.setTag(R.id.movieIdTag, movie.backdropPath ?: movie.posterPath.orEmpty())
             movieTitle.text = movie.title
@@ -97,7 +98,7 @@ class MoviesAdapter(
             imageLoader.asAnimatedThumbnailInto(
                 holder, MovieImageModel(
                     url
-                ), backdropImage
+                ), this.backdropImage
             )
         }
     }
@@ -109,7 +110,7 @@ class MoviesAdapter(
             parent,
             false
         ).let { binding ->
-            binding.backdropImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            binding.backdropImage.updateLayoutParams<ViewGroup.LayoutParams> {
                 height = parent.resources.getDimensionPixelSize(viewType)
             }
             ViewHolder(binding, adapterLoadingTimestamp)

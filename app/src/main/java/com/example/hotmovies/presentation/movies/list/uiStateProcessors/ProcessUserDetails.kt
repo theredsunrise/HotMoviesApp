@@ -44,16 +44,16 @@ class ProcessUserDetails(
 
     private fun processUserDetailsAction(loadAction: Event<ResultState<Boolean>>) {
         checkMainThread()
-        val loadAction = loadAction.getContentIfNotHandled() ?: return
+        val consumableAction = loadAction.getContentIfNotHandled() ?: return
 
         when {
-            loadAction.isSuccessTrue -> {
+            consumableAction.isSuccessTrue -> {
                 moviesViewModel.sendIntent(LoadMovies)
             }
 
-            loadAction is ResultState.Failure -> userDetailsDialogHandler.showErrorDialog(
+            consumableAction is ResultState.Failure -> userDetailsDialogHandler.showErrorDialog(
                 fragment.findNavController(),
-                loadAction.exception
+                consumableAction.exception
             )
         }
     }
