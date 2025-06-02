@@ -44,7 +44,7 @@ class InitializationViewModelTest {
     lateinit var settingsRepository: SettingsRepositoryInterface
 
     @Test
-    fun `session validity, check if the login session is valid, succeeded`() = runTest {
+    fun `session validity - check if the login session is valid - succeeded`() = runTest {
         coEvery { loginRepository.isSessionValid(token) } returns
                 flowOf(true)
 
@@ -75,7 +75,7 @@ class InitializationViewModelTest {
     }
 
     @Test
-    fun `session validity, check if the login session is valid, failed`() = runTest {
+    fun `session validity - check if the login session is valid - failed`() = runTest {
         coEvery { loginRepository.isSessionValid(token) } returns
                 flowOf(false)
 
@@ -107,7 +107,7 @@ class InitializationViewModelTest {
     }
 
     @Test
-    fun `session validity, check if the login session is valid, throws error`() = runTest {
+    fun `session validity - check if the login session is valid - throws error`() = runTest {
         coEvery { loginRepository.isSessionValid(token) } throws testException
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns flowOf(
             token
@@ -137,7 +137,7 @@ class InitializationViewModelTest {
     }
 
     @Test
-    fun `session validity, stored token was not found, failed`() = runTest {
+    fun `session validity - stored token was not found - failed`() = runTest {
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns
                 flow {
                     throw SettingsRepositoryInterface.Exceptions.NoValueException(
@@ -170,7 +170,7 @@ class InitializationViewModelTest {
     }
 
     @Test
-    fun `session validity, failed to fetch the stored token, throws error`() = runTest {
+    fun `session validity - failed to fetch the stored token - throws error`() = runTest {
         coEvery { settingsRepository.getStringValue(SettingsRepositoryInterface.Keys.AUTH_TOKEN_KEY) } returns
                 flow {
                     throw testException
